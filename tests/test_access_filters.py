@@ -7,6 +7,7 @@
 
 import json
 
+import pytest
 import respx
 from typer.testing import CliRunner
 
@@ -25,6 +26,9 @@ FILTER = {"id": 7, "attr": " referral_source", "type": "exclude", "value": "spam
 
 def make_client() -> Client:
     return Client(Config(token="T"))
+
+
+pytestmark = pytest.mark.integration
 
 
 def cli(args: list[str]):
