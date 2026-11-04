@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Mapping, Optional
 
 from . import registry
@@ -49,3 +50,32 @@ class Resource:
             pretty=pretty,
             raw=raw,
         )
+
+    def _upload(
+        self,
+        op: str,
+        file_path: str,
+        *,
+        field: str = "file",
+        params: Optional[Mapping[str, Any]] = None,
+        pretty: bool = False,
+        **path_params: Any,
+    ) -> Any:
+        """Multipart-загрузка файла (Data Import) через эндпоинт ``group/op``.
+
+        Общий хелпер для всех upload-эндпоинтов Data Import (офлайн-конверсии,
+        звонки, расходы, user params): файл уходит частью ``files={field: …}``
+        с MIME ``text/csv``, остальное — как в :meth:`_call` (registry-путь,
+        query-параметры, pretty).
+
+        :param op: имя операции в registry (эндпоинт с ``multipart=True``).
+        :param file_path: путь к CSV-файлу на диске.
+        :param field: имя form-поля с файлом (в API Метрики обычно ``file``).
+
+        Тело файла читается в память (bytes): CSV ограничен лимитами загрузки,
+        а при HTTP 429 клиент отправляет запрос повторно — file handle после
+        первой отправки в EOF, и ретрай ушёл бы с пустым телом файла.
+        """
+        path = Path(file_path)
+        files = {field: (path.name, path.read_bytes(), "text/csv")}
+        return self._call(op, files=files, params=params, pretty=pretty, **path_params)
