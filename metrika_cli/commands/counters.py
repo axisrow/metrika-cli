@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Annotated, Optional
 
 import typer
 
@@ -21,9 +22,33 @@ def _api(ctx: typer.Context) -> Counters:
 
 @app.command("list")
 @handle_errors
-def list_(ctx: typer.Context) -> None:
+def list_(
+    ctx: typer.Context,
+    per_page: Annotated[
+        Optional[int],
+        typer.Option(
+            "--per-page", help="Счётчиков на страницу (≤10000, дефолт API 1000)."
+        ),
+    ] = None,
+    offset: Annotated[
+        Optional[int],
+        typer.Option("--offset", help="Порядковый номер первого счётчика (с 1)."),
+    ] = None,
+    all_pages: Annotated[
+        bool,
+        typer.Option("--all", help="Забрать все страницы (цикл по offset до rows)."),
+    ] = False,
+) -> None:
     """Список доступных счётчиков."""
-    render(ctx, _api(ctx).list(pretty=get_state(ctx).pretty))
+    render(
+        ctx,
+        _api(ctx).list(
+            per_page=per_page,
+            offset=offset,
+            all_pages=all_pages,
+            pretty=get_state(ctx).pretty,
+        ),
+    )
 
 
 @app.command("get")
