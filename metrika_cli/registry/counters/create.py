@@ -10,5 +10,5 @@ ENDPOINT = Endpoint(
     "create",
     "POST",
     "management/v1/counters",
-    "Создать счётчик (тело: {\"counter\": {...}})",
+    'Создать счётчик (тело: {"counter": {...}})',
 )

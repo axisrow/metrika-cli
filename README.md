@@ -1,14 +1,29 @@
 # metrika-cli
 
-CLI для API Яндекс Метрики. Структура зеркалит API 1:1: одна группа команд = одно API.
+CLI для API Яндекс Метрики. Структура зеркалит API 1:1: одна группа команд = одна ресурсная группа API.
 
-Три группы (17 эндпоинтов, v0.0.1):
+18 групп (17 эндпоинтов в v0.0.1; для групп с пометкой «каркас» команды приходят в фичевых PR — issues 2–19 эпика):
 
 | Группа | API | Префикс | Операции |
 |---|---|---|---|
-| `metrika stat` | Reports API | `/stat/v1` | `table`, `bytime`, `comparison`, `drilldown`, `pivot` |
 | `metrika counters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
+| `metrika goals` | Management API | `/management/v1` | каркас: CRUD целей счётчика |
+| `metrika filters` | Management API | `/management/v1` | каркас: CRUD фильтров счётчика (лимит 30/счётчик) |
+| `metrika operations` | Management API | `/management/v1` | каркас: CRUD операций счётчика (лимит 30/счётчик) |
+| `metrika grants` | Management API | `/management/v1` | каркас: доступы к счётчику, включая публичные |
+| `metrika delegates` | Management API | `/management/v1` | каркас: представители |
+| `metrika accounts` | Management API | `/management/v1` | каркас: список аккаунтов пользователя |
+| `metrika segments` | Management API | `/management/v1` | каркас: сегменты счётчика (apisegment) |
+| `metrika labels` | Management API | `/management/v1` | каркас: метки и привязка к счётчикам |
+| `metrika annotations` | Management API | `/management/v1` | каркас: графические аннотации счётчика |
+| `metrika access_filters` | Management API | `/management/v1` | каркас: фильтры доступа |
+| `metrika stat` | Reports API | `/stat/v1` | `table`, `bytime`, `comparison`, `drilldown`, `pivot` |
 | `metrika logs` | Logs API | `/management/v1/counter/{id}/logrequest…` | `evaluate`, `list`, `create`, `info`, `cancel`, `clean`, `download-part` |
+| `metrika conversions` | Data Import | `/management/v1` | каркас: офлайн-конверсии (upload + uploadings) |
+| `metrika calls` | Data Import | `/management/v1` | каркас: офлайн-звонки (upload) |
+| `metrika expenses` | Data Import | `/management/v1` | каркас: загрузка расходов |
+| `metrika user_params` | Data Import | `/management/v1` | каркас: параметры посетителей |
+| `metrika yclid` | Data Import | `/management/v1` | каркас: YCLID-конверсии (upload + uploadings) |
 
 ## Установка
 

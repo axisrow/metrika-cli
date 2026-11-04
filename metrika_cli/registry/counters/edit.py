@@ -10,6 +10,6 @@ ENDPOINT = Endpoint(
     "edit",
     "PUT",
     "management/v1/counter/{counterId}",
-    "Изменить счётчик (тело: {\"counter\": {...}})",
+    'Изменить счётчик (тело: {"counter": {...}})',
     path_params=("counterId",),
 )
