@@ -23,9 +23,11 @@ from .config import Config
 DEFAULT_TIMEOUT = 30.0
 
 #: Повторных попыток после HTTP 429 (итого попыток: RETRY_429_ATTEMPTS + 1).
-RETRY_429_ATTEMPTS = 1
-#: Пауза перед повтором, если API не отдал заголовок Retry-After.
-RETRY_429_DEFAULT_WAIT = 60.0
+RETRY_429_ATTEMPTS = 2
+#: База экспоненциальной паузы перед повтором: 30с, затем 60с. Заголовок
+#: Retry-After официальной документацией Метрики не подтверждён (см.
+#: docs/api-notes.md), но учитывается, если API его отдаст.
+RETRY_429_DEFAULT_WAIT = 30.0
 
 
 def _sleep(seconds: float) -> None:
@@ -33,15 +35,16 @@ def _sleep(seconds: float) -> None:
     time.sleep(seconds)
 
 
-def _retry_wait(response: httpx.Response) -> float:
-    """Пауза до повтора: Retry-After от API, иначе дефолт. Мусорный заголовок не роняет."""
+def _retry_wait(response: httpx.Response, attempt: int) -> float:
+    """Пауза до повтора: Retry-After от API, иначе экспоненциальный backoff
+    (30с → 60с). Мусорный заголовок не роняет."""
     raw = response.headers.get("Retry-After")
     if raw:
         try:
             return max(float(raw), 0.0)
         except ValueError:
             pass
-    return RETRY_429_DEFAULT_WAIT
+    return RETRY_429_DEFAULT_WAIT * (2**attempt)
 
 
 class APIError(RuntimeError):
@@ -114,13 +117,14 @@ class Client:
             query["pretty"] = 1
 
         # HTTP 429 — квотный голод: повтор безопасен (запрос отклонён до
-        # обработки), ретраим с паузой Retry-After/60с. Пауза печатается в
-        # stderr, чтобы ожидание не было молчаливым.
+        # обработки). Retry-After доками не подтверждён, поэтому экспонен-
+        # циальный backoff 30с → 60с; заголовок учитывается, если отдаётся.
+        # Пауза печатается в stderr, чтобы ожидание не было молчаливым.
         response = self._send(method, path, query, json, files)
         for attempt in range(RETRY_429_ATTEMPTS):
             if response.status_code != 429:
                 break
-            wait = _retry_wait(response)
+            wait = _retry_wait(response, attempt)
             print(
                 f"HTTP 429: пауза {wait:g}с и повтор (осталось попыток: "
                 f"{RETRY_429_ATTEMPTS - attempt})…",
