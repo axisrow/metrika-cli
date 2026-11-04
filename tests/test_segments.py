@@ -2,6 +2,7 @@
 
 import json
 
+import pytest
 import respx
 from typer.testing import CliRunner
 
@@ -10,6 +11,10 @@ from metrika_cli.cli import app
 from metrika_cli.client import Client
 from metrika_cli.config import Config
 from metrika_cli.registry import get_endpoint
+
+# integration: файл смешивает unit-тесты registry и respx-проверки api/CLI,
+# метка выбирает файл через -m integration (профиль остальных тестовых файлов)
+pytestmark = pytest.mark.integration
 
 BASE = "https://api-metrika.yandex.net"
 
