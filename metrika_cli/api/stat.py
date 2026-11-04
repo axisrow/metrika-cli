@@ -1,4 +1,4 @@
-"""Ресурс «Отчёты» (Reports API, /stat/v1) — 5 эндпоинтов.
+"""Ресурс «Отчёты» (Reports API, /stat/v1) — 6 эндпоинтов.
 
 Общие параметры: ids, metrics (≤20), dimensions (≤10), date1/date2,
 filters, sort, limit (≤100000, default 100), offset (с 1), preset, lang.
@@ -119,6 +119,36 @@ class Stat(Resource):
     ) -> Any:
         return self._call(
             "drilldown",
+            params=_clean(locals(), "self", "csv", "pretty"),
+            path_suffix=".csv" if csv else "",
+            raw=csv,
+            pretty=pretty,
+        )
+
+    # -- comparison_drilldown --------------------------------------------------
+    def comparison_drilldown(
+        self,
+        *,
+        ids: str,
+        metrics: str,
+        dimensions: Optional[str] = None,
+        date1_a: Optional[str] = None,
+        date2_a: Optional[str] = None,
+        date1_b: Optional[str] = None,
+        date2_b: Optional[str] = None,
+        filters_a: Optional[str] = None,
+        filters_b: Optional[str] = None,
+        parent_id: Optional[str] = None,
+        sort: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+        preset: Optional[str] = None,
+        lang: Optional[str] = None,
+        csv: bool = False,
+        pretty: bool = False,
+    ) -> Any:
+        return self._call(
+            "comparison_drilldown",
             params=_clean(locals(), "self", "csv", "pretty"),
             path_suffix=".csv" if csv else "",
             raw=csv,
