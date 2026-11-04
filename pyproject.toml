@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "metrika-cli"
+version = "0.0.1"
+description = "CLI для API Яндекс Метрики: Management, Reports (Data), Logs, Offline-конверсии"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "metrika-cli" }]
+keywords = ["yandex", "metrika", "api", "cli", "analytics"]
+dependencies = [
+    "typer>=0.12",
+    "httpx>=0.27",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-mock>=3.12",
+    "respx>=0.21",
+    "black>=24.0",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+metrika = "metrika_cli.cli:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["metrika_cli"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+markers = [
+    "unit: изолированный модуль/функция, без сети",
+    "integration: связка слоёв через respx-моки",
+    "smoke: дымовой прогон CLI без сети (структура, справка, ошибки)",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
