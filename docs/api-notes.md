@@ -66,6 +66,8 @@
 
 Реестр ресурсов из llms.txt (ops на 2026-11-04): counter (8), grant (8), goal (7), segment (5), operation (5), label (5), filter (5), expense (5), chart_annotation (5), access_filter (5), user_params (4), offline_conversions (3), delegates (3), chats (3), call (3), account (3), measurement (2 — Measurement Protocol), cloud (2), clients (1); stat: data, bytime, comparison, comparison_drilldown, drilldown, pivot; logs: 7 операций (createLogRequest, getLogRequests, getLogRequest, evaluate, download, cancel, clean). Итого ~75 эндпоинтов.
 
+**Вендореный справочник путей:** `metrika_cli/_resource_mapping.py` — копия `resource_mapping.py` из [tapi-yandex-metrika](https://github.com/pavelmaksimov/tapi-yandex-metrika) (MIT; библиотека не обновлялась с 2022-04). ~50 эндпоинтов management/logs/stats с путями, HTTP-методами и параметрами. Не зависимость: в рантайме не импортируется, используется как стартовая точка путей при расширении registry; каждый путь сверять с живым openapi-справочником (файлу 4+ года). Из него уже подтверждены пути goals/filters/operations/grants (в т.ч. `DELETE /grant?user_login=`), calls (`offline_conversions/upload_calls`), user_params (`uploadings/upload`), segments (`apisegment/…`), labels (`management/v1/labels`), пагинация `counters` (`per_page`/`offset`). Не покрывает expenses/access_filter — для них источник правды llms.txt.
+
 ## Открытые вопросы (для следующих версий)
 
 - Полный OAuth-flow для CLI и минимальный scope для read-only отчётов.
