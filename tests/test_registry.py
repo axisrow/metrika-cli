@@ -18,6 +18,7 @@ def test_endpoints_loaded() -> None:
         "labels",
         "annotations",
         "operations",
+        "access_filters",
     } <= groups
 
 
