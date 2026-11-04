@@ -71,10 +71,11 @@ class Resource:
         :param op: имя операции в registry (эндпоинт с ``multipart=True``).
         :param file_path: путь к CSV-файлу на диске.
         :param field: имя form-поля с файлом (в API Метрики обычно ``file``).
+
+        Тело файла читается в память (bytes): CSV ограничен лимитами загрузки,
+        а при HTTP 429 клиент отправляет запрос повторно — file handle после
+        первой отправки в EOF, и ретрай ушёл бы с пустым телом файла.
         """
         path = Path(file_path)
-        with path.open("rb") as fh:
-            files = {field: (path.name, fh, "text/csv")}
-            return self._call(
-                op, files=files, params=params, pretty=pretty, **path_params
-            )
+        files = {field: (path.name, path.read_bytes(), "text/csv")}
+        return self._call(op, files=files, params=params, pretty=pretty, **path_params)

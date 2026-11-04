@@ -5,6 +5,7 @@
 
 from pathlib import Path
 
+import httpx
 import pytest
 import respx
 from typer.testing import CliRunner
@@ -76,6 +77,26 @@ def test_upload_query_params(tmp_path: Path) -> None:
     req = respx.calls[-1].request
     assert req.url.params["comment"] == "загрузка"
     assert req.url.params["type"] == "BASIC"
+
+
+@respx.mock
+def test_upload_retry_429_resends_body(tmp_path: Path, monkeypatch) -> None:
+    """Регресс: file handle после первой отправки в EOF — ретрай шлёт
+    пустой файл. Тело держится bytes, оба POST несут полный CSV."""
+    monkeypatch.setattr("metrika_cli.client._sleep", lambda s: None)
+    route = respx.post(
+        f"{BASE}/management/v1/counter/1/offline_conversions/upload"
+    ).mock(
+        side_effect=[
+            httpx.Response(429, headers={"Retry-After": "0"}),
+            httpx.Response(200, json={"uploading": {}}),
+        ]
+    )
+    with make_client() as c:
+        Conversions(c).upload(1, write_csv(tmp_path))
+    assert route.call_count == 2
+    for call in route.calls:
+        assert CSV_HEADER in call.request.read()
 
 
 # -- api: чтение ------------------------------------------------------------
