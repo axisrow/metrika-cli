@@ -21,7 +21,7 @@ CLI для API Яндекс Метрики. Структура зеркалит 
 | `metrika logs` | Logs API | `/management/v1/counter/{id}/logrequest…` | `evaluate`, `list`, `create`, `info`, `cancel`, `clean`, `download-part` |
 | `metrika conversions` | Data Import | `/management/v1` | каркас: офлайн-конверсии (upload + uploadings) |
 | `metrika calls` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading` |
-| `metrika expenses` | Data Import | `/management/v1` | каркас: загрузка расходов |
+| `metrika expenses` | Data Import | `/management/v1` | `upload`, `delete`, `delete-single`, `uploadings`, `uploading` |
 | `metrika user_params` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading`, `confirm` |
 | `metrika yclid` | Data Import | `/management/v1` | пустая группа: API yclid_conversions удалён Яндексом (17.06.2020) — YCLID-конверсии передаются через `metrika conversions` (`client_id_type=YCLID`) |
 
