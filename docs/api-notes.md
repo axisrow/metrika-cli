@@ -53,9 +53,18 @@
 
 ## Опровергнуто при верификации (НЕ использовать)
 
-1. «Management API даёт полный CRUD по segments, labels, chart annotations, clients, Yandex Cloud exports» — голос 1-2, не подтверждено.
+1. ~~«Management API даёт полный CRUD по segments, labels, chart annotations, clients, Yandex Cloud exports»~~ — **ПОПРАВКА от 2026-11-04 (позже исследования):** прямая проверка llms.txt показала, что в Management OpenAPI-справочнике эти ресурсы ЕСТЬ: `segment` (5 ops), `label` (5), `chart_annotation` (5), `access_filter` (5), `chats` (3), `clients` (1), `cloud` (2). Вердикт 1-2 верификаторов был ошибочным. При дизайне CLI опираться на перечень ресурсов из llms.txt.
 2. «Только три stat-эндпоинта (data/bytime/comparison)» — упускает drilldown и pivot; всего их пять.
 3. Префиксы `ym:u:`/`ym:ep:` — встречались только у сторонних источников; официально подтверждена лишь пара `ym:s:`/`ym:pv:`. Не хардкодить префикс в CLI.
+
+## Машиночитаемый контракт
+
+Единого downloadable OpenAPI/Swagger-файла (json/yaml) Метрика не публикует (`index.yaml` в корне доков — сборочный манифест Diplodoc, не API-спека). Машиночитаемость обеспечивают:
+
+1. **`https://yandex.ru/dev/metrika/ru/llms.txt`** — полный машинный индекс документации (для LLM-агентов): все секции + по одному .md на каждый эндпоинт и схему.
+2. **OpenAPI-справочники в Markdown**: `https://yandex.ru/dev/metrika/ru/<api>/openapi/<ресурс>/<операция>.md` — генерированная страница на каждый эндпоинт (параметры, схемы запроса/ответа, ошибки). Сайт собирается Diplodoc (ревизия r21770580 на 2026-11-04).
+
+Реестр ресурсов из llms.txt (ops на 2026-11-04): counter (8), grant (8), goal (7), segment (5), operation (5), label (5), filter (5), expense (5), chart_annotation (5), access_filter (5), user_params (4), offline_conversions (3), delegates (3), chats (3), call (3), account (3), measurement (2 — Measurement Protocol), cloud (2), clients (1); stat: data, bytime, comparison, comparison_drilldown, drilldown, pivot; logs: 7 операций (createLogRequest, getLogRequests, getLogRequest, evaluate, download, cancel, clean). Итого ~75 эндпоинтов.
 
 ## Открытые вопросы (для следующих версий)
 

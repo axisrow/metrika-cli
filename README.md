@@ -87,6 +87,8 @@ ruff check .
 
 ## Roadmap
 
-- Management: цели, фильтры, операции, grants, delegates;
-- Data Import: офлайн-конверсии, звонки, расходы (upload на management-хосте);
-- `stat evaluate`, каталог метрик/группировок.
+- Management: цели, фильтры, операции, grants, delegates, accounts;
+- Management (следующий слой): segments, labels, chart annotations, access filters, chats, clients, cloud exports;
+- Data Import: офлайн-конверсии, звонки, расходы, user params (upload на management-хосте);
+- `stat evaluate`, каталог метрик/группировок;
+- `metrika auth login` (OAuth device-flow).
