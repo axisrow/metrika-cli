@@ -2,7 +2,7 @@
 
 CLI для API Яндекс Метрики. Структура зеркалит API 1:1: одна группа команд = одна ресурсная группа API.
 
-18 групп (39 эндпоинтов; для групп с пометкой «каркас» команды приходят в фичевых PR — issues 2–19 эпика):
+18 групп (44 эндпоинта; для групп с пометкой «каркас» команды приходят в фичевых PR — issues 2–19 эпика):
 
 | Группа | API | Префикс | Операции |
 |---|---|---|---|
@@ -10,7 +10,7 @@ CLI для API Яндекс Метрики. Структура зеркалит 
 | `metrika goals` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
 | `metrika filters` | Management API | `/management/v1` | каркас: CRUD фильтров счётчика (лимит 30/счётчик) |
 | `metrika operations` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
-| `metrika grants` | Management API | `/management/v1` | каркас: доступы к счётчику, включая публичные |
+| `metrika grants` | Management API | `/management/v1` | `list`, `create`, `delete`, `public-set`, `public-delete` |
 | `metrika delegates` | Management API | `/management/v1` | каркас: представители |
 | `metrika accounts` | Management API | `/management/v1` | каркас: список аккаунтов пользователя |
 | `metrika segments` | Management API | `/management/v1` | каркас: сегменты счётчика (apisegment) |
