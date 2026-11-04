@@ -38,7 +38,7 @@
 - `bytime`: + `group=day|week|…`; `comparison`: `date1_a/date2_a` vs `date1_b/date2_b` или `filters_a` vs `filters_b`; `drilldown`: дерево, `parent_id`; `pivot`: + `pivot_dimensions`.
 - Формат ответа: `query` (эхо запроса), `data[]` (строки: `dimensions[]` — объекты с `name` (+`id`), `metrics[]` — числа), `totals`, `total_rows`, сэмплинг: `sampled`, `sample_share`, `sample_size`, `data_lag`.
 - `lang` управляет языком значений; omit → `en` (подтверждено только для stat, голос 2-1 — в CLI передаётся как есть, дефолт не хардкодится).
-- Операции OpenAPI stat (llms.txt, 2026-11-04): `data` («Таблица»), `bytime`, `comparison`, `comparison_drilldown`, `drilldown`, `pivot` — всего 6; в registry заведены 5, `comparison_drilldown` подтверждён докой, но пока не заведён (кандидат в отдельный issue). `evaluate` и «каталог метрик/группировок» как эндпоинты в Reports API ОТСУТСТВУЮТ — см. «Опровергнуто» №4.
+- Операции OpenAPI stat (llms.txt, 2026-11-04): `data` («Таблица»), `bytime`, `comparison`, `comparison_drilldown`, `drilldown`, `pivot` — всего 6; все заведены в registry (`comparison_drilldown` — PR #35, путь `/stat/v1/data/comparison/drilldown`). `evaluate` и «каталог метрик/группировок» как эндпоинты в Reports API ОТСУТСТВУЮТ — см. «Опровергнуто» №4.
 
 ## Logs API — контракт и workflow
 

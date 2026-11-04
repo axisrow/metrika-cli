@@ -1,4 +1,5 @@
-"""Команды группы ``stat`` (Reports API: table/bytime/comparison/drilldown/pivot)."""
+"""Команды группы ``stat`` (Reports API: table/bytime/comparison/drilldown/pivot
+и comparison_drilldown)."""
 
 from __future__ import annotations
 
@@ -213,6 +214,54 @@ def drilldown(
             date1=date1,
             date2=date2,
             filters=filters,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+            preset=preset,
+            lang=lang,
+            csv=csv,
+        ),
+        csv,
+    )
+
+
+@app.command("comparison-drilldown")
+@handle_errors
+def comparison_drilldown(
+    ctx: typer.Context,
+    ids: IDS,
+    metrics: METRICS,
+    date1_a: Annotated[Optional[str], typer.Option(help="Период A: начало.")] = None,
+    date2_a: Annotated[Optional[str], typer.Option(help="Период A: конец.")] = None,
+    date1_b: Annotated[Optional[str], typer.Option(help="Период B: начало.")] = None,
+    date2_b: Annotated[Optional[str], typer.Option(help="Период B: конец.")] = None,
+    filters_a: Annotated[Optional[str], typer.Option(help="Сегмент A.")] = None,
+    filters_b: Annotated[Optional[str], typer.Option(help="Сегмент B.")] = None,
+    parent_id: Annotated[
+        Optional[str], typer.Option("--parent-id", help="ID узла для разворачивания.")
+    ] = None,
+    dimensions: DIMENSIONS = None,
+    sort: SORT = None,
+    limit: LIMIT = None,
+    offset: OFFSET = None,
+    preset: PRESET = None,
+    lang: LANG = None,
+    csv: CSV = False,
+) -> None:
+    """Сравнение периодов/сегментов по дереву группировок (drill down)."""
+    _emit(
+        ctx,
+        _api(ctx).comparison_drilldown(
+            ids=ids,
+            metrics=metrics,
+            dimensions=dimensions,
+            date1_a=date1_a,
+            date2_a=date2_a,
+            date1_b=date1_b,
+            date2_b=date2_b,
+            filters_a=filters_a,
+            filters_b=filters_b,
+            parent_id=parent_id,
             sort=sort,
             limit=limit,
             offset=offset,
