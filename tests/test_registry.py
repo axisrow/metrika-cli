@@ -8,9 +8,9 @@ pytestmark = pytest.mark.unit
 
 
 def test_endpoints_loaded() -> None:
-    assert len(registry.ENDPOINTS) == 22
+    assert len(registry.ENDPOINTS) == 29
     groups = {ep.group for ep in registry.ENDPOINTS}
-    assert {"counters", "stat", "logs", "annotations"} <= groups
+    assert {"counters", "stat", "logs", "labels", "annotations"} <= groups
 
 
 def test_paths_from_host_root() -> None:
