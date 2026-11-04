@@ -1,5 +1,7 @@
 """Юнит-проверки реестра эндпоинтов."""
 
+from pathlib import Path
+
 import pytest
 
 from metrika_cli import registry
@@ -8,7 +10,21 @@ pytestmark = pytest.mark.unit
 
 
 def test_endpoints_loaded() -> None:
-    assert len(registry.ENDPOINTS) == 69
+    # Страж без хардкода счётчика: множество (group, op) реестра обязано
+    # совпадать с фактическим деревом registry/<group>/<op>.py, так что
+    # добавление эндпоинта не требует правки теста. Рассинхрон — файл без
+    # ENDPOINT, дубль (group, op) или каталог вне GROUPS — роняет тест
+    # (или импорт реестра, что тоже красный прогон).
+    tree = Path(registry.__file__).parent
+    file_keys = {
+        (group.name, f.stem)
+        for group in tree.iterdir()
+        if group.is_dir() and not group.name.startswith("_")
+        for f in group.glob("*.py")
+        if not f.name.startswith("_") and f.name != "__init__.py"
+    }
+    registry_keys = {(ep.group, ep.op) for ep in registry.ENDPOINTS}
+    assert file_keys == registry_keys
     groups = {ep.group for ep in registry.ENDPOINTS}
     assert {
         "counters",
