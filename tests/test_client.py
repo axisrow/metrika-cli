@@ -4,7 +4,7 @@ import httpx
 import pytest
 import respx
 
-from metrika_cli.client import APIError, Client
+from metrika_cli.client import APIError, Client, RateLimitError
 from metrika_cli.config import Config
 
 pytestmark = pytest.mark.unit
@@ -45,15 +45,56 @@ def test_error_envelope() -> None:
 
 @respx.mock
 def test_429_retry(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr("metrika_cli.client._sleep", lambda s: None)
+    """Экспоненциальный backoff: два 429, паузы 30с → 60с, потом успех."""
+    waits: list[float] = []
+    monkeypatch.setattr("metrika_cli.client._sleep", lambda s: waits.append(s))
     respx.get(f"{BASE}/x").mock(
         side_effect=[
-            httpx.Response(429, headers={"Retry-After": "0"}),
+            httpx.Response(429),
+            httpx.Response(429),
             httpx.Response(200, json={"ok": 1}),
         ]
     )
     with make_client() as c:
         assert c.request("GET", "x") == {"ok": 1}
+    assert waits == [30.0, 60.0]
+
+
+@respx.mock
+def test_429_retry_after_header(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Retry-After от API перекрывает экспоненциальный backoff."""
+    waits: list[float] = []
+    monkeypatch.setattr("metrika_cli.client._sleep", lambda s: waits.append(s))
+    respx.get(f"{BASE}/x").mock(
+        side_effect=[
+            httpx.Response(429, headers={"Retry-After": "7"}),
+            httpx.Response(200, json={"ok": 1}),
+        ]
+    )
+    with make_client() as c:
+        assert c.request("GET", "x") == {"ok": 1}
+    assert waits == [7.0]
+
+
+@respx.mock
+def test_429_exhausted(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Исчерпание ретраев: 429 на все 3 попытки — RateLimitError.
+
+    side_effect даёт ровно 3 ответа: четвёртый запрос упал бы моком,
+    поэтому тест попутно фиксирует количество запросов.
+    """
+    waits: list[float] = []
+    monkeypatch.setattr("metrika_cli.client._sleep", lambda s: waits.append(s))
+    respx.get(f"{BASE}/x").mock(
+        side_effect=[
+            httpx.Response(429),
+            httpx.Response(429),
+            httpx.Response(429),
+        ]
+    )
+    with make_client() as c, pytest.raises(RateLimitError):
+        c.request("GET", "x")
+    assert waits == [30.0, 60.0]
 
 
 @respx.mock

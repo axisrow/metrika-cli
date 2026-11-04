@@ -24,7 +24,8 @@
 ## Квоты и ошибки (общие для всех API)
 
 - 30 req/s на IP (все API); 10 req/s (Logs API); 3 параллельных + 5000 запросов/сутки на пользователя; отчёты — 200/5 мин.
-- При превышении — HTTP 429 (тип квоты в теле ответа). Клиент ретраит 1 раз с паузой `Retry-After`/60с.
+- При превышении — HTTP 429: в теле тип превышенной квоты (`quota_requests_by_ip`, `quota_requests_by_uid`, `quota_parallel_requests`, `quota_requests_by_counter_id`, `quota_delegate_requests`, `quota_grants_requests` — по errors.md) в едином конверте ошибок.
+- **`Retry-After` при 429 — не подтверждён** (investigation 2026-11-04 по докам: 0 упоминаний в quotas.md и errors.md, машинный индекс llms.txt страницы про ретраи не содержит). Живая проверка отложена до появления тестового токена (по решению владельца). Клиент: 2 повторные попытки, экспоненциальный backoff 30с → 60с; заголовок `Retry-After` учитывается, если API его отдаст. Источники: [quotas.md](https://yandex.ru/dev/metrika/ru/intro/quotas.md), [errors.md](https://yandex.ru/dev/metrika/ru/intro/errors.md).
 - Единый конверт ошибок: `{"errors": [{"error_type": …, "message": …, "location": …}], "code": <http-status>, "message": …}`.
 
 ## Reports API (/stat/v1) — контракт
@@ -71,7 +72,7 @@
 ## Открытые вопросы (для следующих версий)
 
 - Полный OAuth-flow для CLI и минимальный scope для read-only отчётов.
-- Есть ли `Retry-After` при 429 и отдельные квоты по разделам.
+- ~~Есть ли `Retry-After` при 429 и отдельные квоты по разделам~~ — закрыто 2026-11-04 по докам (см. «Квоты и ошибки»); живая проверка отложена до появления тестового токена (по решению владельца).
 - Пагинация list-эндпоинтов Management/Logs.
 - Контракты upload-эндпоинтов Data Import (CSV-форматы conversions/calls/expenses) — в v0.0.1 отложены.
 
