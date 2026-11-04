@@ -15,6 +15,7 @@ def test_endpoints_loaded() -> None:
         "goals",
         "stat",
         "logs",
+        "segments",
         "labels",
         "annotations",
         "operations",

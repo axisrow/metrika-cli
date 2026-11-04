@@ -13,7 +13,7 @@ CLI для API Яндекс Метрики. Структура зеркалит 
 | `metrika grants` | Management API | `/management/v1` | `list`, `create`, `delete`, `public-set`, `public-delete` |
 | `metrika delegates` | Management API | `/management/v1` | каркас: представители |
 | `metrika accounts` | Management API | `/management/v1` | каркас: список аккаунтов пользователя |
-| `metrika segments` | Management API | `/management/v1` | каркас: сегменты счётчика (apisegment) |
+| `metrika segments` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
 | `metrika labels` | Management API | `/management/v1` | каркас: метки и привязка к счётчикам |
 | `metrika annotations` | Management API | `/management/v1` | каркас: графические аннотации счётчика |
 | `metrika access_filters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
