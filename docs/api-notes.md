@@ -11,7 +11,7 @@
 | API | Префикс путей | Что делает |
 |---|---|---|
 | **Management API** | `/management/v1/…` | CRUD: счётчики, цели, фильтры, операции, grants, delegates |
-| **Reports (stat)** | `/stat/v1/…` | Агрегированные отчёты: `data`, `data/bytime`, `data/comparison`, `data/drilldown`, `data/pivot`, пресеты |
+| **Reports (stat)** | `/stat/v1/…` | Агрегированные отчёты: `data`, `data/bytime`, `data/comparison`, `data/comparison/drilldown`, `data/drilldown`, `data/pivot`, пресеты |
 | **Logs API** | `/management/v1/counter/{counterId}/logrequest…` | Неагрегированные сырые данные (хиты/визиты), асинхронный workflow |
 | **Data Import** | `/management/v1/…` (физически management-хост) | Расходы, CRM, звонки (`uploadCalls`), офлайн-конверсии, user params, Measurement Protocol |
 
@@ -55,7 +55,7 @@
 ## Опровергнуто при верификации (НЕ использовать)
 
 1. ~~«Management API даёт полный CRUD по segments, labels, chart annotations, clients, Yandex Cloud exports»~~ — **ПОПРАВКА от 2026-11-04 (позже исследования):** прямая проверка llms.txt показала, что в Management OpenAPI-справочнике эти ресурсы ЕСТЬ: `segment` (5 ops), `label` (5), `chart_annotation` (5), `access_filter` (5), `chats` (3), `clients` (1), `cloud` (2). Вердикт 1-2 верификаторов был ошибочным. При дизайне CLI опираться на перечень ресурсов из llms.txt.
-2. «Только три stat-эндпоинта (data/bytime/comparison)» — упускает drilldown и pivot; всего их пять.
+2. ~~«Только три stat-эндпоинта (data/bytime/comparison)» — упускает drilldown и pivot; всего их пять~~ — **ПОПРАВКА от 2026-11-04 (позже исследования, issue #7):** прямая проверка llms.txt показала, что stat OpenAPI содержит 6 операций: `data`, `bytime`, `comparison`, `comparison_drilldown` («Сравнение — drill down», путь `/stat/v1/data/comparison/drilldown`), `drilldown`, `pivot`. Итого шесть, не пять (см. также «Опровергнуто» №4).
 3. Префиксы `ym:u:`/`ym:ep:` — встречались только у сторонних источников; официально подтверждена лишь пара `ym:s:`/`ym:pv:`. Не хардкодить префикс в CLI.
 4. «stat evaluate» (оценка объёма запроса до выполнения) и «каталог метрик/группировок как API-эндпоинт» (issue #7) — НЕ существуют в Reports API. Проверено 2026-11-04: полный индекс llms.txt содержит для stat ровно 6 OpenAPI-операций (см. контракт выше); `stat/openapi/evaluate.md` (ru и en) → HTTP 404; вендорный справочник tapi-yandex-metrika знает только `stat/v1/data`. Оценка объёма данных в Метрике есть только в Logs API (`logrequests/evaluate`, реализован). Справочник метрик/группировок — статические страницы доков (`stat/attrandmetr/dim_all.md`, разделы `stat/metrics/*` и `stat/attributes/*`), не API-ресурс: CLI-команда для него потребовала бы скрейпинг HTML доков вместо OAuth-вызова — в registry не заводить.
 
