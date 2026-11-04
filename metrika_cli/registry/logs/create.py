@@ -12,6 +12,6 @@ ENDPOINT = Endpoint(
     "create",
     "POST",
     "management/v1/counter/{counterId}/logrequests",
-    "Создать лог-запрос (тело: {\"source\",\"date1\",\"date2\",\"fields\"})",
+    'Создать лог-запрос (тело: {"source","date1","date2","fields"})',
     path_params=("counterId",),
 )

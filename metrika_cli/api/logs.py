@@ -26,10 +26,16 @@ class Logs(Resource):
         fields: Optional[str] = None,
         pretty: bool = False,
     ) -> Any:
-        params = {k: v for k, v in (
-            ("date1", date1), ("date2", date2),
-            ("source", source), ("fields", fields),
-        ) if v is not None}
+        params = {
+            k: v
+            for k, v in (
+                ("date1", date1),
+                ("date2", date2),
+                ("source", source),
+                ("fields", fields),
+            )
+            if v is not None
+        }
         return self._call("evaluate", counterId=counter_id, params=params or None)
 
     def list(self, counter_id: int, *, pretty: bool = False) -> Any:
@@ -53,9 +59,7 @@ class Logs(Resource):
             "clean", counterId=counter_id, requestId=request_id, pretty=pretty
         )
 
-    def download_part(
-        self, counter_id: int, request_id: int, part_number: int
-    ) -> Any:
+    def download_part(self, counter_id: int, request_id: int, part_number: int) -> Any:
         """CSV-часть выгрузки: вернуть текст (для --out или stdout)."""
         return self._call(
             "download_part",

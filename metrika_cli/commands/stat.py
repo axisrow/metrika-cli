@@ -14,21 +14,34 @@ app = typer.Typer(help="Отчёты (Reports API, /stat/v1).", no_args_is_help=
 
 # Общие опции отчёта (до 20 метрик / 10 группировок; limit ≤100000; offset с 1).
 IDS = Annotated[str, typer.Option("--ids", help="ID счётчиков через запятую.")]
-METRICS = Annotated[str, typer.Option("--metrics", help="Метрики через запятую (ym:s:visits…).")]
+METRICS = Annotated[
+    str, typer.Option("--metrics", help="Метрики через запятую (ym:s:visits…).")
+]
 DIMENSIONS = Annotated[
     Optional[str], typer.Option("--dimensions", help="Группировки через запятую (≤10).")
 ]
-DATE1 = Annotated[Optional[str], typer.Option("--date1", help="Начало периода (YYYY-MM-DD).")]
+DATE1 = Annotated[
+    Optional[str], typer.Option("--date1", help="Начало периода (YYYY-MM-DD).")
+]
 DATE2 = Annotated[Optional[str], typer.Option("--date2", help="Конец периода.")]
 FILTERS = Annotated[
     Optional[str],
     typer.Option("--filters", help="Фильтр-выражение: ym:s:pageViews>5, …"),
 ]
-SORT = Annotated[Optional[str], typer.Option("--sort", help="Сортировка: -ym:s:visits…")]
-LIMIT = Annotated[Optional[int], typer.Option("--limit", help="Строк на страницу (≤100000).")]
+SORT = Annotated[
+    Optional[str], typer.Option("--sort", help="Сортировка: -ym:s:visits…")
+]
+LIMIT = Annotated[
+    Optional[int], typer.Option("--limit", help="Строк на страницу (≤100000).")
+]
 OFFSET = Annotated[Optional[int], typer.Option("--offset", help="Смещение (с 1).")]
-PRESET = Annotated[Optional[str], typer.Option("--preset", help="Пресет отчёта, напр. sources_summary.")]
-LANG = Annotated[Optional[str], typer.Option("--lang", help="Язык значений группировок (ru/en…).")]
+PRESET = Annotated[
+    Optional[str],
+    typer.Option("--preset", help="Пресет отчёта, напр. sources_summary."),
+]
+LANG = Annotated[
+    Optional[str], typer.Option("--lang", help="Язык значений группировок (ru/en…).")
+]
 CSV = Annotated[bool, typer.Option("--csv", help="Ответ CSV вместо JSON.")]
 
 
@@ -64,9 +77,18 @@ def table(
     _emit(
         ctx,
         _api(ctx).table(
-            ids=ids, metrics=metrics, dimensions=dimensions, date1=date1,
-            date2=date2, filters=filters, sort=sort, limit=limit,
-            offset=offset, preset=preset, lang=lang, csv=csv,
+            ids=ids,
+            metrics=metrics,
+            dimensions=dimensions,
+            date1=date1,
+            date2=date2,
+            filters=filters,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+            preset=preset,
+            lang=lang,
+            csv=csv,
         ),
         csv,
     )
@@ -96,9 +118,19 @@ def bytime(
     _emit(
         ctx,
         _api(ctx).bytime(
-            ids=ids, metrics=metrics, group=group, dimensions=dimensions,
-            date1=date1, date2=date2, filters=filters, sort=sort,
-            limit=limit, offset=offset, preset=preset, lang=lang, csv=csv,
+            ids=ids,
+            metrics=metrics,
+            group=group,
+            dimensions=dimensions,
+            date1=date1,
+            date2=date2,
+            filters=filters,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+            preset=preset,
+            lang=lang,
+            csv=csv,
         ),
         csv,
     )
@@ -128,10 +160,21 @@ def comparison(
     _emit(
         ctx,
         _api(ctx).comparison(
-            ids=ids, metrics=metrics, date1_a=date1_a, date2_a=date2_a,
-            date1_b=date1_b, date2_b=date2_b, filters_a=filters_a,
-            filters_b=filters_b, dimensions=dimensions, sort=sort,
-            limit=limit, offset=offset, preset=preset, lang=lang, csv=csv,
+            ids=ids,
+            metrics=metrics,
+            date1_a=date1_a,
+            date2_a=date2_a,
+            date1_b=date1_b,
+            date2_b=date2_b,
+            filters_a=filters_a,
+            filters_b=filters_b,
+            dimensions=dimensions,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+            preset=preset,
+            lang=lang,
+            csv=csv,
         ),
         csv,
     )
@@ -163,9 +206,19 @@ def drilldown(
     _emit(
         ctx,
         _api(ctx).drilldown(
-            ids=ids, metrics=metrics, dimensions=dimensions, parent_id=parent_id,
-            date1=date1, date2=date2, filters=filters, sort=sort,
-            limit=limit, offset=offset, preset=preset, lang=lang, csv=csv,
+            ids=ids,
+            metrics=metrics,
+            dimensions=dimensions,
+            parent_id=parent_id,
+            date1=date1,
+            date2=date2,
+            filters=filters,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+            preset=preset,
+            lang=lang,
+            csv=csv,
         ),
         csv,
     )
@@ -177,9 +230,7 @@ def pivot(
     ctx: typer.Context,
     ids: IDS,
     metrics: METRICS,
-    dimensions: Annotated[
-        str, typer.Option("--dimensions", help="Группировки (≤10).")
-    ],
+    dimensions: Annotated[str, typer.Option("--dimensions", help="Группировки (≤10).")],
     pivot_dimensions: Annotated[
         str, typer.Option("--pivot-dimensions", help="Размерности разворота.")
     ],
@@ -197,10 +248,19 @@ def pivot(
     _emit(
         ctx,
         _api(ctx).pivot(
-            ids=ids, metrics=metrics, dimensions=dimensions,
-            pivot_dimensions=pivot_dimensions, date1=date1, date2=date2,
-            filters=filters, sort=sort, limit=limit, offset=offset,
-            preset=preset, lang=lang, csv=csv,
+            ids=ids,
+            metrics=metrics,
+            dimensions=dimensions,
+            pivot_dimensions=pivot_dimensions,
+            date1=date1,
+            date2=date2,
+            filters=filters,
+            sort=sort,
+            limit=limit,
+            offset=offset,
+            preset=preset,
+            lang=lang,
+            csv=csv,
         ),
         csv,
     )

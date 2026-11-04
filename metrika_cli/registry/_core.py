@@ -24,10 +24,18 @@ GROUP_GRANTS = "grants"
 GROUP_FILTERS = "filters"
 GROUP_OPERATIONS = "operations"
 GROUP_DELEGATES = "delegates"
+GROUP_ACCOUNTS = "accounts"
 GROUP_STAT = "stat"
 GROUP_LOGS = "logs"
 GROUP_CONVERSIONS = "conversions"
 GROUP_CALLS = "calls"
+GROUP_EXPENSES = "expenses"
+GROUP_USER_PARAMS = "user_params"
+GROUP_SEGMENTS = "segments"
+GROUP_LABELS = "labels"
+GROUP_ANNOTATIONS = "annotations"
+GROUP_ACCESS_FILTERS = "access_filters"
+GROUP_YCLID = "yclid"
 
 #: Имя переменной, в которой каждый файл-эндпоинт объявляет свой ``Endpoint``.
 ENDPOINT_ATTR = "ENDPOINT"
@@ -57,16 +65,27 @@ class Endpoint:
 
 #: Порядок групп для отображения/итерации (фиксирован ЯВНО, не из ФС).
 GROUPS: Tuple[str, ...] = (
+    # Management-ресурсы (/management/v1).
     GROUP_COUNTERS,
     GROUP_GOALS,
-    GROUP_GRANTS,
     GROUP_FILTERS,
     GROUP_OPERATIONS,
+    GROUP_GRANTS,
     GROUP_DELEGATES,
+    GROUP_ACCOUNTS,
+    GROUP_SEGMENTS,
+    GROUP_LABELS,
+    GROUP_ANNOTATIONS,
+    GROUP_ACCESS_FILTERS,
+    # Отдельные API.
     GROUP_STAT,
     GROUP_LOGS,
+    # Data Import (management-хост), в конце.
     GROUP_CONVERSIONS,
     GROUP_CALLS,
+    GROUP_EXPENSES,
+    GROUP_USER_PARAMS,
+    GROUP_YCLID,
 )
 
 

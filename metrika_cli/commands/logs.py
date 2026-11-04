@@ -62,7 +62,10 @@ def create(
     data: str = typer.Option(..., "--data", help=DATA_HELP),
 ) -> None:
     """Создать лог-запрос (период ≤1 год; квота 10 ГБ/счётчик)."""
-    render(ctx, _api(ctx).create(counter_id, parse_data(data), pretty=get_state(ctx).pretty))
+    render(
+        ctx,
+        _api(ctx).create(counter_id, parse_data(data), pretty=get_state(ctx).pretty),
+    )
 
 
 @app.command("info")
