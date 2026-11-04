@@ -13,22 +13,17 @@ from ..render import render
 
 app = typer.Typer(help="Загрузка расходов (Data Import).", no_args_is_help=True)
 
-FILE_HELP = "CSV-файл (обязательные колонки: Date, UTMSource/TrafficSource, Expenses)."
-
-DELETE_FILE_HELP = "CSV-файл условий удаления (обязательная колонка Date)."
-
 
 def _api(ctx: typer.Context) -> Expenses:
     return Expenses(get_state(ctx).client())
 
 
-def _read_csv(path: str) -> tuple[str, bytes]:
-    """Прочитать CSV-файл: (имя файла, содержимое)."""
-    p = Path(path)
-    try:
-        return p.name, p.read_bytes()
-    except OSError as exc:
-        raise typer.BadParameter(f"Не удалось прочитать файл: {exc}")
+def _checked_path(value: str) -> str:
+    """Проверить, что путь --file существует и это файл."""
+    path = Path(value)
+    if not path.is_file():
+        raise typer.BadParameter(f"Файл не найден: {value}")
+    return value
 
 
 @app.command("upload")
@@ -36,20 +31,26 @@ def _read_csv(path: str) -> tuple[str, bytes]:
 def upload(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
-    file: str = typer.Option(..., "--file", help=FILE_HELP),
-    comment: Optional[str] = typer.Option(None, "--comment", help="Комментарий."),
+    file: str = typer.Option(
+        ...,
+        "--file",
+        help=(
+            "Путь к CSV-файлу (обязательные колонки: Date, "
+            "UTMSource/TrafficSource, Expenses)."
+        ),
+    ),
+    comment: Optional[str] = typer.Option(None, help="Комментарий."),
     provider: Optional[str] = typer.Option(
-        None, "--provider", help="Провайдер данных (по умолчанию default)."
+        None, help="Провайдер данных (по умолчанию default)."
     ),
 ) -> None:
-    """Загрузить расходы (multipart CSV)."""
-    filename, content = _read_csv(file)
+    """Загрузить расходы из CSV (multipart-запрос)."""
+    _checked_path(file)
     render(
         ctx,
         _api(ctx).upload(
             counter_id,
-            filename,
-            content,
+            file,
             comment=comment,
             provider=provider,
             pretty=get_state(ctx).pretty,
@@ -62,22 +63,24 @@ def upload(
 def delete(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
-    file: str = typer.Option(..., "--file", help=DELETE_FILE_HELP),
-    comment: Optional[str] = typer.Option(None, "--comment", help="Комментарий."),
+    file: str = typer.Option(
+        ...,
+        "--file",
+        help="Путь к CSV-файлу условий удаления (обязательная колонка Date).",
+    ),
+    comment: Optional[str] = typer.Option(None, help="Комментарий."),
     provider: Optional[str] = typer.Option(
         None,
-        "--provider",
         help="Провайдер (без него удалятся данные всех провайдеров).",
     ),
 ) -> None:
-    """Удалить расходы по CSV-файлу условий (multipart)."""
-    filename, content = _read_csv(file)
+    """Удалить расходы по CSV-файлу условий (multipart-запрос)."""
+    _checked_path(file)
     render(
         ctx,
         _api(ctx).delete(
             counter_id,
-            filename,
-            content,
+            file,
             comment=comment,
             provider=provider,
             pretty=get_state(ctx).pretty,
@@ -139,31 +142,31 @@ def delete_single(
     )
 
 
-@app.command("list")
+@app.command("uploadings")
 @handle_errors
-def list_(
+def uploadings(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
-    limit: Optional[int] = typer.Option(None, "--limit", help="Сколько загрузок."),
+    limit: Optional[int] = typer.Option(None, help="Сколько загрузок (default 10000)."),
     offset: Optional[int] = typer.Option(
-        None, "--offset", help="С какой загрузки начать (первая — 0)."
+        None, help="С какой загрузки начать (первая — 0)."
     ),
 ) -> None:
     """Список загрузок расходов."""
     render(
         ctx,
-        _api(ctx).list(
+        _api(ctx).uploadings(
             counter_id, limit=limit, offset=offset, pretty=get_state(ctx).pretty
         ),
     )
 
 
-@app.command("get")
+@app.command("uploading")
 @handle_errors
-def get(
+def uploading(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
-    uploading_id: int = typer.Argument(..., help="ID загрузки."),
+    id: int = typer.Argument(..., help="ID загрузки."),
 ) -> None:
     """Информация о загрузке расходов."""
-    render(ctx, _api(ctx).get(counter_id, uploading_id, pretty=get_state(ctx).pretty))
+    render(ctx, _api(ctx).uploading(counter_id, id, pretty=get_state(ctx).pretty))

@@ -10,7 +10,7 @@ from .._core import Endpoint, GROUP_EXPENSES
 
 ENDPOINT = Endpoint(
     GROUP_EXPENSES,
-    "list",
+    "uploadings",
     "GET",
     "management/v1/counter/{counterId}/expense/uploadings",
     "Список загрузок расходов",

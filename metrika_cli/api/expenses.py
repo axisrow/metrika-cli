@@ -1,27 +1,17 @@
-"""Ресурс «Расходы на рекламу» (Data Import, management API) — 5 эндпоинтов.
+"""Ресурс «Расходы на рекламу» (Data Import, management-хост) — 5 эндпоинтов.
 
-Имена методов совпадают с ``op`` соответствующих эндпоинтов в registry.
+Требуемый scope токена: ``metrika:expenses``. Данные Директа загружать не
+нужно (Метрика получает их автоматически); confirm в openapi отсутствует,
+удаление — через ``delete`` (multipart CSV условий) или ``delete_single``
+(условия в query). Проверено по openapi 2026-11-05.
 """
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from ..base import Resource
 from ..registry import GROUP_EXPENSES
-
-#: Multipart-тип загружаемого CSV-файла.
-CSV_MIME = "text/csv"
-
-
-def _csv_file(filename: str, content: bytes) -> Dict[str, Any]:
-    """Multipart-поле ``file`` для загрузки CSV."""
-    return {"file": (filename, content, CSV_MIME)}
-
-
-def _optional(**kwargs: Any) -> Dict[str, Any]:
-    """Отобрать только переданные (не None) query-параметры."""
-    return {k: v for k, v in kwargs.items() if v is not None}
 
 
 class Expenses(Resource):
@@ -30,18 +20,22 @@ class Expenses(Resource):
     def upload(
         self,
         counter_id: int,
-        filename: str,
-        content: bytes,
+        file_path: str,
         *,
         comment: Optional[str] = None,
         provider: Optional[str] = None,
         pretty: bool = False,
     ) -> Any:
-        """Загрузить CSV с расходами (multipart/form-data)."""
-        return self._call(
+        """Загрузить CSV с расходами (multipart, поле ``file``)."""
+        params = {
+            k: v
+            for k, v in (("comment", comment), ("provider", provider))
+            if v is not None
+        }
+        return self._upload(
             "upload",
-            params=_optional(comment=comment, provider=provider),
-            files=_csv_file(filename, content),
+            file_path,
+            params=params or None,
             pretty=pretty,
             counterId=counter_id,
         )
@@ -49,18 +43,22 @@ class Expenses(Resource):
     def delete(
         self,
         counter_id: int,
-        filename: str,
-        content: bytes,
+        file_path: str,
         *,
         comment: Optional[str] = None,
         provider: Optional[str] = None,
         pretty: bool = False,
     ) -> Any:
-        """Удалить расходы по CSV-файлу условий (multipart/form-data)."""
-        return self._call(
+        """Удалить расходы по CSV-файлу условий (multipart, поле ``file``)."""
+        params = {
+            k: v
+            for k, v in (("comment", comment), ("provider", provider))
+            if v is not None
+        }
+        return self._upload(
             "delete",
-            params=_optional(comment=comment, provider=provider),
-            files=_csv_file(filename, content),
+            file_path,
+            params=params or None,
             pretty=pretty,
             counterId=counter_id,
         )
@@ -82,25 +80,24 @@ class Expenses(Resource):
         pretty: bool = False,
     ) -> Any:
         """Удалить расходы по условиям, переданным в query запроса."""
+        pairs = (
+            ("date", date),
+            ("trafficSource", traffic_source),
+            ("trafficSourceDetail", traffic_source_detail),
+            ("UTMSource", utm_source),
+            ("UTMMedium", utm_medium),
+            ("UTMCampaign", utm_campaign),
+            ("UTMTerm", utm_term),
+            ("UTMContent", utm_content),
+            ("provider", provider),
+            ("comment", comment),
+        )
+        params = {k: v for k, v in pairs if v is not None}
         return self._call(
-            "delete_single",
-            params=_optional(
-                date=date,
-                trafficSource=traffic_source,
-                trafficSourceDetail=traffic_source_detail,
-                UTMSource=utm_source,
-                UTMMedium=utm_medium,
-                UTMCampaign=utm_campaign,
-                UTMTerm=utm_term,
-                UTMContent=utm_content,
-                provider=provider,
-                comment=comment,
-            ),
-            pretty=pretty,
-            counterId=counter_id,
+            "delete_single", counterId=counter_id, params=params, pretty=pretty
         )
 
-    def list(
+    def uploadings(
         self,
         counter_id: int,
         *,
@@ -108,25 +105,22 @@ class Expenses(Resource):
         offset: Optional[int] = None,
         pretty: bool = False,
     ) -> Any:
-        """Список загрузок расходов."""
+        """Список загрузок расходов счётчика."""
+        params = {
+            k: v for k, v in (("limit", limit), ("offset", offset)) if v is not None
+        }
         return self._call(
-            "list",
-            params=_optional(limit=limit, offset=offset),
-            pretty=pretty,
-            counterId=counter_id,
+            "uploadings", counterId=counter_id, params=params or None, pretty=pretty
         )
 
-    def get(
+    def uploading(
         self,
         counter_id: int,
-        uploading_id: int,
+        id: int,
         *,
         pretty: bool = False,
     ) -> Any:
-        """Информация о загрузке расходов."""
+        """Информация о загрузке расходов по ID."""
         return self._call(
-            "get",
-            pretty=pretty,
-            counterId=counter_id,
-            uploadingId=uploading_id,
+            "uploading", counterId=counter_id, uploadingId=id, pretty=pretty
         )
