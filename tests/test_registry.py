@@ -8,7 +8,7 @@ pytestmark = pytest.mark.unit
 
 
 def test_endpoints_loaded() -> None:
-    assert len(registry.ENDPOINTS) == 50
+    assert len(registry.ENDPOINTS) == 68
     groups = {ep.group for ep in registry.ENDPOINTS}
     assert {
         "counters",
@@ -22,6 +22,7 @@ def test_endpoints_loaded() -> None:
         "access_filters",
         "delegates",
         "accounts",
+        "conversions",
     } <= groups
 
 
