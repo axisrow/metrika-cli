@@ -251,3 +251,160 @@ def test_cli_upload_missing_file_rejected(tmp_path) -> None:
         ],
     )
     assert result.exit_code != 0
+
+
+# -- schema (PR8) --------------------------------------------------------------
+
+
+@respx.mock
+def test_attributes_entity_type_required() -> None:
+    respx.get(f"{CDP}/schema/attributes").respond(json={})
+    with make_client() as c:
+        Cdp(c).attributes(123, "CONTACT")
+    assert respx.calls[-1].request.url.params["entity_type"] == "CONTACT"
+
+
+@respx.mock
+def test_create_attributes_body_and_query() -> None:
+    respx.post(f"{CDP}/schema/attributes").respond(json={})
+    with make_client() as c:
+        Cdp(c).create_attributes(
+            123,
+            {"attributes": [{"name": "age", "multivalued": False}]},
+            entity_type="ORDER",
+        )
+    req = respx.calls[-1].request
+    assert req.url.params["entity_type"] == "ORDER"
+    assert json.loads(req.read()) == {
+        "attributes": [{"name": "age", "multivalued": False}]
+    }
+
+
+@respx.mock
+def test_order_statuses_get() -> None:
+    route = respx.get(f"{CDP}/schema/order_statuses").respond(json={})
+    with make_client() as c:
+        Cdp(c).order_statuses(123)
+    assert route.called
+
+
+@respx.mock
+def test_map_order_statuses_body() -> None:
+    respx.post(f"{CDP}/schema/order_statuses").respond(json={})
+    with make_client() as c:
+        Cdp(c).map_order_statuses(
+            123, {"order_statuses": [{"id": "done", "goal_action_ids": []}]}
+        )
+    assert json.loads(respx.calls[-1].request.read()) == {
+        "order_statuses": [{"id": "done", "goal_action_ids": []}]
+    }
+
+
+@respx.mock
+def test_predefined_types_and_types() -> None:
+    respx.get(f"{CDP}/schema/predefined_types").respond(json={})
+    respx.get(f"{CDP}/schema/types").respond(json={})
+    with make_client() as c:
+        Cdp(c).predefined_types(123)
+        Cdp(c).types(123)
+    assert respx.calls[0].request.url.path.endswith("/schema/predefined_types")
+    assert respx.calls[1].request.url.path.endswith("/schema/types")
+
+
+@respx.mock
+def test_create_products_body() -> None:
+    route = respx.post(f"{CDP}/schema/products").respond(json={})
+    with make_client() as c:
+        Cdp(c).create_products(123, {"attributes": [], "items": [{"name": "t"}]})
+    assert route.called
+    assert json.loads(respx.calls[-1].request.read()) == {
+        "attributes": [],
+        "items": [{"name": "t"}],
+    }
+
+
+@respx.mock
+def test_cli_attributes() -> None:
+    respx.get(f"{CDP}/schema/attributes").respond(json={})
+    result = runner.invoke(
+        app,
+        ["--token", "T", "cdp", "attributes", "123", "--entity-type", "ORDER"],
+    )
+    assert result.exit_code == 0
+    assert respx.calls[-1].request.url.params["entity_type"] == "ORDER"
+
+
+@respx.mock
+def test_cli_create_attributes_wraps_list() -> None:
+    respx.post(f"{CDP}/schema/attributes").respond(json={})
+    result = runner.invoke(
+        app,
+        [
+            "--token",
+            "T",
+            "cdp",
+            "create-attributes",
+            "123",
+            "--entity-type",
+            "CONTACT",
+            "--data",
+            '[{"name": "email"}]',
+        ],
+    )
+    assert result.exit_code == 0
+    assert json.loads(respx.calls[-1].request.read()) == {
+        "attributes": [{"name": "email"}]
+    }
+
+
+@respx.mock
+def test_cli_map_order_statuses_wraps_list() -> None:
+    respx.post(f"{CDP}/schema/order_statuses").respond(json={})
+    result = runner.invoke(
+        app,
+        [
+            "--token",
+            "T",
+            "cdp",
+            "map-order-statuses",
+            "123",
+            "--data",
+            '[{"id": "done"}]',
+        ],
+    )
+    assert result.exit_code == 0
+    assert json.loads(respx.calls[-1].request.read()) == {
+        "order_statuses": [{"id": "done"}]
+    }
+
+
+@respx.mock
+def test_cli_schema_reads() -> None:
+    respx.get(f"{CDP}/schema/order_statuses").respond(json={})
+    respx.get(f"{CDP}/schema/predefined_types").respond(json={})
+    respx.get(f"{CDP}/schema/types").respond(json={})
+    for command in ("order-statuses", "predefined-types", "types"):
+        result = runner.invoke(app, ["--token", "T", "cdp", command, "123"])
+        assert result.exit_code == 0
+
+
+@respx.mock
+def test_cli_create_products() -> None:
+    respx.post(f"{CDP}/schema/products").respond(json={})
+    result = runner.invoke(
+        app,
+        [
+            "--token",
+            "T",
+            "cdp",
+            "create-products",
+            "123",
+            "--data",
+            '{"attributes": [], "items": [{"name": "t"}]}',
+        ],
+    )
+    assert result.exit_code == 0
+    assert json.loads(respx.calls[-1].request.read()) == {
+        "attributes": [],
+        "items": [{"name": "t"}],
+    }

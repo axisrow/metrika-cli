@@ -2,7 +2,7 @@
 
 CLI для API Яндекс Метрики. Структура зеркалит API 1:1: одна группа команд = одна ресурсная группа API.
 
-18 групп (81 эндпоинт): management (11 групп), stat (6 операций), logs (7 операций) и Data Import (4 группы).
+22 группы (105 эндпоинтов): management (13 групп), stat (6 операций), logs (7 операций), Data Import (4 группы), export (/export/v1) и cdp (/cdp/api/v1).
 
 | Группа | API | Префикс | Операции |
 |---|---|---|---|
@@ -17,12 +17,16 @@ CLI для API Яндекс Метрики. Структура зеркалит 
 | `metrika labels` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete`, `link`, `unlink` |
 | `metrika annotations` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
 | `metrika access_filters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
+| `metrika clients` | Management API | `/management/v1` | `list` |
+| `metrika measurement` | Management API | `/management/v1` | `generate`, `delete` |
 | `metrika stat` | Reports API | `/stat/v1` | `table`, `bytime`, `comparison`, `drilldown`, `comparison-drilldown`, `pivot` |
 | `metrika logs` | Logs API | `/management/v1/counter/{id}/logrequest…` | `evaluate`, `list`, `create`, `info`, `cancel`, `clean`, `download-part` |
 | `metrika conversions` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading` |
 | `metrika calls` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading` |
 | `metrika expenses` | Data Import | `/management/v1` | `upload`, `delete`, `delete-single`, `uploadings`, `uploading` |
 | `metrika user_params` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading`, `confirm` |
+| `metrika export` | Yandex Cloud export | `/export/v1` | `list`, `delete` |
+| `metrika cdp` | CDP/CRM | `/cdp/api/v1` | `upload-contacts`, `upload-contacts-json`, `upload-orders`, `upload-orders-json`, `upload-simple-orders`, `last-uploadings`, `attributes`, `create-attributes`, `order-statuses`, `map-order-statuses`, `predefined-types`, `types`, `create-products` |
 | `metrika yclid` | Data Import | `/management/v1` | пустая группа: API yclid_conversions удалён Яндексом (17.06.2020) — YCLID-конверсии передаются через `metrika conversions` (`client_id_type=YCLID`) |
 
 ## Установка
@@ -104,14 +108,16 @@ ruff check .
 
 Реализовано:
 
-- Management API: `counters`, `goals`, `filters`, `operations`, `grants`, `delegates`, `accounts`, `segments`, `labels`, `annotations`, `access_filters`;
+- Management API: `counters`, `goals`, `filters`, `operations`, `grants`, `delegates`, `accounts`, `segments`, `labels`, `annotations`, `access_filters`, `clients`, `measurement`;
 - Reports API (`stat`): `table`, `bytime`, `comparison`, `comparison-drilldown`, `drilldown`, `pivot` — 6 операций; `stat evaluate` и каталог метрик/группировок как эндпоинты не существуют (вердикт в [docs/api-notes.md](docs/api-notes.md));
 - Logs API (`logs`): `evaluate`, `list`, `create`, `info`, `cancel`, `clean`, `download-part` — 7 операций;
-- Data Import: `conversions`, `calls`, `expenses`, `user_params`; `yclid` — API удалён Яндексом (17.06.2020), YCLID-конверсии идут через `metrika conversions` (`client_id_type=YCLID`), группа показывает вердикт-справку.
+- Data Import: `conversions`, `calls`, `expenses`, `user_params`; `yclid` — API удалён Яндексом (17.06.2020), YCLID-конверсии идут через `metrika conversions` (`client_id_type=YCLID`), группа показывает вердикт-справку;
+- Экспорт в Yandex Cloud (`export`, `/export/v1`): `list`, `delete`;
+- CDP/CRM (`cdp`, `/cdp/api/v1`): загрузки клиентов/заказов (CSV и JSON), simple_orders, last-uploadings, schema (атрибуты, статусы заказов, типы, товары).
 
 Отложено владельцем:
 
 - `metrika auth login` (OAuth device-flow) — issue #12;
 - живая проверка обработки `Retry-After` — до появления тестового токена (ретрай в `client.py` покрыт юнит-тестами).
 
-Не заведены (есть в API, вне эпика): chats, clients, cloud exports, Measurement Protocol.
+Не заведены (есть в API, вне эпика): chats — единственная недостающая операция `findAll_chats` имеет противоречивую страницу openapi (обсуждение в issue #42); загрузка/статус чатов покрываются `metrika conversions --type CHATS`.

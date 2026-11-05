@@ -1,13 +1,15 @@
-"""Ресурс «CDP/CRM: клиенты и заказы» (/cdp/api/v1) — загрузки.
+"""Ресурс «CDP/CRM: клиенты и заказы» (/cdp/api/v1) — загрузки и schema.
 
-Первая половина группы (schema-операции добавляются отдельным PR).
 Параметры сверены с официальным openapi
 (management/openapi/schema/*.md, ревизия r21770580, 2026-11-05):
 - CSV-загрузки — multipart (поле ``file``) + query columns_mapping,
   merge_mode (обязательные), delimiter_type (опциональный);
 - JSON-загрузки — тело {"contacts": [...]} / {"orders": [...]},
   merge_mode (обязательный);
-- last_uploadings — query datetime_offset, limit (1..1000), source.
+- last_uploadings — query datetime_offset, limit (1..1000), source;
+- schema: entity_type (CONTACT|ORDER) обязателен у attributes
+  (GET/POST), тела POST — {"attributes": [...]} / {"order_statuses":
+  [...]} / {"attributes": [...], "items": [...]}.
 """
 
 from __future__ import annotations
@@ -117,6 +119,60 @@ class Cdp(Resource):
         return self._call(
             "last_uploadings", counterId=counter_id, params=params or None,
             pretty=pretty,
+        )
+
+    # -- schema ----------------------------------------------------------------
+
+    def attributes(self, counter_id: int, entity_type: str, *, pretty: bool = False) -> Any:
+        """Все атрибуты сущности (entity_type: CONTACT | ORDER — обязательный)."""
+        return self._call(
+            "attributes",
+            counterId=counter_id,
+            params={"entity_type": entity_type},
+            pretty=pretty,
+        )
+
+    def create_attributes(
+        self, counter_id: int, attributes: dict, *, entity_type: str, pretty: bool = False
+    ) -> Any:
+        """Создать атрибуты (тело {"attributes": [...]}, entity_type обязательный)."""
+        return self._call(
+            "create_attributes",
+            counterId=counter_id,
+            params={"entity_type": entity_type},
+            json=attributes,
+            pretty=pretty,
+        )
+
+    def order_statuses(self, counter_id: int, *, pretty: bool = False) -> Any:
+        """Сопоставленные статусы заказов."""
+        return self._call("order_statuses", counterId=counter_id, pretty=pretty)
+
+    def map_order_statuses(
+        self, counter_id: int, order_statuses: dict, *, pretty: bool = False
+    ) -> Any:
+        """Сопоставить статусы заказов (тело {"order_statuses": [...]})."""
+        return self._call(
+            "map_order_statuses",
+            counterId=counter_id,
+            json=order_statuses,
+            pretty=pretty,
+        )
+
+    def predefined_types(self, counter_id: int, *, pretty: bool = False) -> Any:
+        """Типы пользовательских атрибутов."""
+        return self._call("predefined_types", counterId=counter_id, pretty=pretty)
+
+    def types(self, counter_id: int, *, pretty: bool = False) -> Any:
+        """Типы системных атрибутов."""
+        return self._call("types", counterId=counter_id, pretty=pretty)
+
+    def create_products(
+        self, counter_id: int, products: dict, *, pretty: bool = False
+    ) -> Any:
+        """Создать список товаров (тело {"attributes": [...], "items": [...]})."""
+        return self._call(
+            "create_products", counterId=counter_id, json=products, pretty=pretty
         )
 
     @staticmethod
