@@ -48,10 +48,14 @@ class Delimiter(str, Enum):
 
 
 class EntityType(str, Enum):
-    """Принадлежность атрибутов (openapi schema/getAttributes.md)."""
+    """Принадлежность атрибутов (openapi schema/getAttributes.md):
+    CONTACT — контакты; COMPANY — компании; ORDER — заказы;
+    SIMPLE_ORDER — простые заказы."""
 
     CONTACT = "CONTACT"
+    COMPANY = "COMPANY"
     ORDER = "ORDER"
+    SIMPLE_ORDER = "SIMPLE_ORDER"
 
 
 def _wrap(key: str, data) -> dict:
@@ -239,7 +243,9 @@ def attributes(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
     entity_type: EntityType = typer.Option(
-        ..., "--entity-type", help="Принадлежность: CONTACT | ORDER (обязательный)."
+        ...,
+        "--entity-type",
+        help="Принадлежность: CONTACT | COMPANY | ORDER | SIMPLE_ORDER (обязательный).",
     ),
 ) -> None:
     """Все атрибуты сущности."""
@@ -257,7 +263,9 @@ def create_attributes(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
     entity_type: EntityType = typer.Option(
-        ..., "--entity-type", help="Принадлежность: CONTACT | ORDER (обязательный)."
+        ...,
+        "--entity-type",
+        help="Принадлежность: CONTACT | COMPANY | ORDER | SIMPLE_ORDER (обязательный).",
     ),
     data: str = typer.Option(..., "--data", help=DATA_HELP),
 ) -> None:

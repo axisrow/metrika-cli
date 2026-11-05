@@ -335,6 +335,18 @@ def test_cli_attributes() -> None:
 
 
 @respx.mock
+def test_cli_attributes_simple_order_entity() -> None:
+    """SIMPLE_ORDER — одно из 4 значений entity_type (getAttributes.md)."""
+    respx.get(f"{CDP}/schema/attributes").respond(json={})
+    result = runner.invoke(
+        app,
+        ["--token", "T", "cdp", "attributes", "123", "--entity-type", "SIMPLE_ORDER"],
+    )
+    assert result.exit_code == 0
+    assert respx.calls[-1].request.url.params["entity_type"] == "SIMPLE_ORDER"
+
+
+@respx.mock
 def test_cli_create_attributes_wraps_list() -> None:
     respx.post(f"{CDP}/schema/attributes").respond(json={})
     result = runner.invoke(

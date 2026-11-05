@@ -6,11 +6,11 @@ CLI для API Яндекс Метрики. Структура зеркалит 
 
 | Группа | API | Префикс | Операции |
 |---|---|---|---|
-| `metrika counters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
-| `metrika goals` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
+| `metrika counters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete`, `undelete` |
+| `metrika goals` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete`, `messengers`, `social-networks` |
 | `metrika filters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
 | `metrika operations` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
-| `metrika grants` | Management API | `/management/v1` | `list`, `create`, `delete`, `public-set`, `public-delete` |
+| `metrika grants` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete`, `my-grant`, `public-set`, `public-delete` |
 | `metrika delegates` | Management API | `/management/v1` | `list`, `create`, `delete` |
 | `metrika accounts` | Management API | `/management/v1` | `list`, `update`, `delete` |
 | `metrika segments` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
