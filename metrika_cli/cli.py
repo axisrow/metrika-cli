@@ -45,6 +45,7 @@ from .commands import conversions as conversions_cli
 from .commands import calls as calls_cli
 from .commands import expenses as expenses_cli
 from .commands import user_params as user_params_cli
+from .commands import export as export_cli
 from .commands import yclid as yclid_cli
 
 app = typer.Typer(
@@ -78,6 +79,7 @@ app.add_typer(conversions_cli.app, name="conversions")
 app.add_typer(calls_cli.app, name="calls")
 app.add_typer(expenses_cli.app, name="expenses")
 app.add_typer(user_params_cli.app, name="user_params")
+app.add_typer(export_cli.app, name="export")
 app.add_typer(yclid_cli.app, name="yclid")
 
 
