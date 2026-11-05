@@ -124,7 +124,8 @@ class Cdp(Resource):
     # -- schema ----------------------------------------------------------------
 
     def attributes(self, counter_id: int, entity_type: str, *, pretty: bool = False) -> Any:
-        """Все атрибуты сущности (entity_type: CONTACT | ORDER — обязательный)."""
+        """Все атрибуты сущности (entity_type: CONTACT | COMPANY | ORDER |
+        SIMPLE_ORDER — обязательный)."""
         return self._call(
             "attributes",
             counterId=counter_id,
