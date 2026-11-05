@@ -38,6 +38,7 @@ GROUP_ACCESS_FILTERS = "access_filters"
 GROUP_CLIENTS = "clients"
 GROUP_MEASUREMENT = "measurement"
 GROUP_EXPORT = "export"
+GROUP_CDP = "cdp"
 GROUP_YCLID = "yclid"
 
 #: Имя переменной, в которой каждый файл-эндпоинт объявляет свой ``Endpoint``.
@@ -90,8 +91,9 @@ GROUPS: Tuple[str, ...] = (
     GROUP_CALLS,
     GROUP_EXPENSES,
     GROUP_USER_PARAMS,
-    # Экспорт в Yandex Cloud (/export/v1), в конце.
+    # Экспорт в Yandex Cloud (/export/v1) и CDP/CRM (/cdp/api/v1), в конце.
     GROUP_EXPORT,
+    GROUP_CDP,
     GROUP_YCLID,
 )
 
