@@ -44,7 +44,7 @@
 
 - Эндпоинты (все на management-хосте):
   - `GET /management/v1/counter/{id}/logrequests/evaluate` — оценка (date1, date2, source: hits|visits, fields);
-  - `POST …/logrequests` — создать `{source, date1, date2, fields}`;
+  - `POST …/logrequests` — создать (query: `date1`, `date2`, `fields`, `source` + опциональный `attribution`; тела у запроса нет);
   - `GET …/logrequests` — список;
   - `GET …/logrequest/{requestId}` — статус: `created|canceled|processed|cleaned_by_user|awaiting_retry` + `parts[]`;
   - `GET …/logrequest/{requestId}/part/{partNumber}/download` — CSV-часть;

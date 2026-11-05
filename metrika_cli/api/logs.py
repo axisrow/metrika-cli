@@ -42,7 +42,17 @@ class Logs(Resource):
         return self._call("list", counterId=counter_id, pretty=pretty)
 
     def create(self, counter_id: int, body: dict, *, pretty: bool = False) -> Any:
-        return self._call("create", counterId=counter_id, json=body, pretty=pretty)
+        """Создать лог-запрос: параметры уходят в query, тела у запроса нет.
+
+        ``body`` — dict с ключами date1/date2/fields/source (обязательные) и
+        attribution (опциональный); список ``fields`` склеивается в
+        comma-separated строку — это формат query-параметра по контракту.
+        """
+        params = {k: v for k, v in body.items() if v is not None}
+        fields = params.get("fields")
+        if isinstance(fields, (list, tuple)):
+            params["fields"] = ",".join(fields)
+        return self._call("create", counterId=counter_id, params=params, pretty=pretty)
 
     def info(self, counter_id: int, request_id: int, *, pretty: bool = False) -> Any:
         return self._call(
