@@ -120,3 +120,49 @@ def test_cli_goals_create_data_option() -> None:
     assert json.loads(respx.calls[-1].request.content) == {
         "goal": {"name": "x", "type": "url", "conditions": []}
     }
+
+
+@respx.mock
+def test_messengers_dictionary() -> None:
+    """Справочник мессенджеров: GET /management/v1/messengers без параметров
+    (openapi goal/getMessengers.md, issue #42)."""
+    route = respx.get(f"{BASE}/management/v1/messengers").respond(
+        json={"messengers": [{"id": 1, "name": "telegram"}]}
+    )
+    with make_client() as c:
+        Goals(c).messengers()
+    assert route.called
+    assert not respx.calls[-1].request.url.params
+
+
+@respx.mock
+def test_social_networks_dictionary() -> None:
+    """Справочник соцсетей: GET /management/v1/social_networks без параметров
+    (openapi goal/getSocialNetworks.md, issue #42)."""
+    route = respx.get(f"{BASE}/management/v1/social_networks").respond(
+        json={"social_networks": [{"id": 2, "name": "vk"}]}
+    )
+    with make_client() as c:
+        Goals(c).social_networks()
+    assert route.called
+    assert not respx.calls[-1].request.url.params
+
+
+@respx.mock
+def test_cli_messengers() -> None:
+    route = respx.get(f"{BASE}/management/v1/messengers").respond(
+        json={"messengers": []}
+    )
+    result = runner.invoke(app, ["--token", "T", "goals", "messengers"])
+    assert result.exit_code == 0
+    assert route.called
+
+
+@respx.mock
+def test_cli_social_networks() -> None:
+    route = respx.get(f"{BASE}/management/v1/social_networks").respond(
+        json={"social_networks": []}
+    )
+    result = runner.invoke(app, ["--token", "T", "goals", "social-networks"])
+    assert result.exit_code == 0
+    assert route.called

@@ -87,3 +87,17 @@ def delete(
 ) -> None:
     """Удалить цель."""
     render(ctx, _api(ctx).delete(counter_id, goal_id, pretty=get_state(ctx).pretty))
+
+
+@app.command("messengers")
+@handle_errors
+def messengers(ctx: typer.Context) -> None:
+    """Справочник мессенджеров (для целей-чатов)."""
+    render(ctx, _api(ctx).messengers(pretty=get_state(ctx).pretty))
+
+
+@app.command("social-networks")
+@handle_errors
+def social_networks(ctx: typer.Context) -> None:
+    """Справочник социальных сетей (для целей-соцсетей)."""
+    render(ctx, _api(ctx).social_networks(pretty=get_state(ctx).pretty))
