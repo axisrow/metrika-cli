@@ -35,6 +35,8 @@ GROUP_SEGMENTS = "segments"
 GROUP_LABELS = "labels"
 GROUP_ANNOTATIONS = "annotations"
 GROUP_ACCESS_FILTERS = "access_filters"
+GROUP_CLIENTS = "clients"
+GROUP_MEASUREMENT = "measurement"
 GROUP_YCLID = "yclid"
 
 #: Имя переменной, в которой каждый файл-эндпоинт объявляет свой ``Endpoint``.
@@ -77,6 +79,8 @@ GROUPS: Tuple[str, ...] = (
     GROUP_LABELS,
     GROUP_ANNOTATIONS,
     GROUP_ACCESS_FILTERS,
+    GROUP_CLIENTS,
+    GROUP_MEASUREMENT,
     # Отдельные API.
     GROUP_STAT,
     GROUP_LOGS,

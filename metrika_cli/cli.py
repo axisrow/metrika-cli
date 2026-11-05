@@ -37,6 +37,8 @@ from .commands import segments as segments_cli
 from .commands import labels as labels_cli
 from .commands import annotations as annotations_cli
 from .commands import access_filters as access_filters_cli
+from .commands import clients as clients_cli
+from .commands import measurement as measurement_cli
 from .commands import stat as stat_cli
 from .commands import logs as logs_cli
 from .commands import conversions as conversions_cli
@@ -68,6 +70,8 @@ app.add_typer(segments_cli.app, name="segments")
 app.add_typer(labels_cli.app, name="labels")
 app.add_typer(annotations_cli.app, name="annotations")
 app.add_typer(access_filters_cli.app, name="access_filters")
+app.add_typer(clients_cli.app, name="clients")
+app.add_typer(measurement_cli.app, name="measurement")
 app.add_typer(stat_cli.app, name="stat")
 app.add_typer(logs_cli.app, name="logs")
 app.add_typer(conversions_cli.app, name="conversions")
