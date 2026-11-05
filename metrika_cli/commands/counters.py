@@ -38,6 +38,59 @@ def list_(
         bool,
         typer.Option("--all", help="Забрать все страницы (цикл по offset до rows)."),
     ] = False,
+    counter_ids: Annotated[
+        Optional[str],
+        typer.Option("--counter-ids", help="ID счётчиков через запятую."),
+    ] = None,
+    favorite: Annotated[
+        Optional[bool],
+        typer.Option("--favorite/--no-favorite", help="Только избранные счётчики."),
+    ] = None,
+    field: Annotated[
+        Optional[str],
+        typer.Option(
+            "--field",
+            help="Доп. поля объекта через запятую: goals, mirrors, grants, filters, "
+            "operations, counter_flags, measurement_tokens.",
+        ),
+    ] = None,
+    label_id: Annotated[
+        Optional[int], typer.Option("--label-id", help="Фильтр по метке.")
+    ] = None,
+    permission: Annotated[
+        Optional[str],
+        typer.Option(
+            "--permission",
+            help="Уровень доступа: own | view | edit | analyst | view_access_filter "
+            "| analyst_access_filter (можно несколько через запятую).",
+        ),
+    ] = None,
+    reverse: Annotated[
+        Optional[bool],
+        typer.Option("--reverse/--no-reverse", help="Обратный порядок сортировки."),
+    ] = None,
+    robots: Annotated[
+        Optional[bool],
+        typer.Option("--robots/--no-robots", help="Учитывать роботов (default true)."),
+    ] = None,
+    search_string: Annotated[
+        Optional[str],
+        typer.Option(
+            "--search-string",
+            help="Подстрока: ID, название, сайт или домен счётчика.",
+        ),
+    ] = None,
+    sort: Annotated[
+        Optional[str],
+        typer.Option("--sort", help="Сортировка: None | Default | Visits."),
+    ] = None,
+    status: Annotated[
+        Optional[str],
+        typer.Option("--status", help="Статус: Active | Deleted."),
+    ] = None,
+    type: Annotated[
+        Optional[str], typer.Option("--type", help="Тип: simple | partner.")
+    ] = None,
 ) -> None:
     """Список доступных счётчиков."""
     render(
@@ -45,6 +98,17 @@ def list_(
         _api(ctx).list(
             per_page=per_page,
             offset=offset,
+            counter_ids=counter_ids,
+            favorite=favorite,
+            field=field,
+            label_id=label_id,
+            permission=permission,
+            reverse=reverse,
+            robots=robots,
+            search_string=search_string,
+            sort=sort,
+            status=status,
+            type=type,
             all_pages=all_pages,
             pretty=get_state(ctx).pretty,
         ),
@@ -56,9 +120,20 @@ def list_(
 def get(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
+    field: Annotated[
+        Optional[str],
+        typer.Option(
+            "--field",
+            help="Доп. поля объекта через запятую: goals, mirrors, grants, filters, "
+            "operations, counter_flags, measurement_tokens.",
+        ),
+    ] = None,
 ) -> None:
     """Информация о счётчике."""
-    render(ctx, _api(ctx).get(counter_id, pretty=get_state(ctx).pretty))
+    render(
+        ctx,
+        _api(ctx).get(counter_id, field=field, pretty=get_state(ctx).pretty),
+    )
 
 
 @app.command("create")
@@ -66,9 +141,25 @@ def get(
 def create(
     ctx: typer.Context,
     data: str = typer.Option(..., "--data", help=DATA_HELP),
+    field: Annotated[
+        Optional[str],
+        typer.Option(
+            "--field",
+            help="Доп. поля возвращаемого объекта через запятую.",
+        ),
+    ] = None,
+    ytm: Annotated[
+        Optional[bool],
+        typer.Option("--ytm/--no-ytm", help="Использование системы управления тегами."),
+    ] = None,
 ) -> None:
     """Создать счётчик (тело: {"counter": {...}})."""
-    render(ctx, _api(ctx).create(parse_data(data), pretty=get_state(ctx).pretty))
+    render(
+        ctx,
+        _api(ctx).create(
+            parse_data(data), field=field, ytm=ytm, pretty=get_state(ctx).pretty
+        ),
+    )
 
 
 @app.command("edit")
@@ -77,11 +168,20 @@ def edit(
     ctx: typer.Context,
     counter_id: int = typer.Argument(..., help="ID счётчика."),
     data: str = typer.Option(..., "--data", help=DATA_HELP),
+    field: Annotated[
+        Optional[str],
+        typer.Option(
+            "--field",
+            help="Доп. поля возвращаемого объекта через запятую.",
+        ),
+    ] = None,
 ) -> None:
     """Изменить счётчик (тело: {"counter": {...}})."""
     render(
         ctx,
-        _api(ctx).edit(counter_id, parse_data(data), pretty=get_state(ctx).pretty),
+        _api(ctx).edit(
+            counter_id, parse_data(data), field=field, pretty=get_state(ctx).pretty
+        ),
     )
 
 
@@ -93,3 +193,13 @@ def delete(
 ) -> None:
     """Удалить счётчик."""
     render(ctx, _api(ctx).delete(counter_id, pretty=get_state(ctx).pretty))
+
+
+@app.command("undelete")
+@handle_errors
+def undelete(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID удалённого счётчика."),
+) -> None:
+    """Восстановить удалённый счётчик."""
+    render(ctx, _api(ctx).undelete(counter_id, pretty=get_state(ctx).pretty))
