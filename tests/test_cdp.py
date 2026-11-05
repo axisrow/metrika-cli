@@ -145,6 +145,28 @@ def test_cli_upload_contacts_csv(tmp_path) -> None:
 
 
 @respx.mock
+def test_cli_upload_accepts_merge_mode_update(tmp_path) -> None:
+    """UPDATE — третье документированное значение merge_mode (issue #42 ревью)."""
+    respx.post(f"{CDP}/data/simple_orders").respond(json={})
+    result = runner.invoke(
+        app,
+        [
+            "--token",
+            "T",
+            "cdp",
+            "upload-simple-orders",
+            "123",
+            "--file",
+            make_csv(tmp_path),
+            "--merge-mode",
+            "UPDATE",
+        ],
+    )
+    assert result.exit_code == 0
+    assert respx.calls[-1].request.url.params["merge_mode"] == "UPDATE"
+
+
+@respx.mock
 def test_cli_upload_contacts_json_wraps_list() -> None:
     respx.post(f"{CDP}/data/contacts/json").respond(json={})
     result = runner.invoke(

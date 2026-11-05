@@ -31,10 +31,13 @@ def _checked_path(value: str) -> str:
 
 
 class MergeMode(str, Enum):
-    """Режим сохранения данных (openapi schema/uploadContacts.md)."""
+    """Режим сохранения данных (openapi schema/uploadContacts.md):
+    APPEND — добавить к ранее загруженному; SAVE — полная замена;
+    UPDATE — обновить только загружаемую сейчас информацию."""
 
     APPEND = "APPEND"
     SAVE = "SAVE"
+    UPDATE = "UPDATE"
 
 
 class Delimiter(str, Enum):
@@ -64,7 +67,7 @@ def upload_contacts(
         help="Соответствие столбцов атрибутам (см. openapi uploadContacts).",
     ),
     merge_mode: MergeMode = typer.Option(
-        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE."
+        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE | UPDATE."
     ),
     delimiter_type: Optional[Delimiter] = typer.Option(
         None, "--delimiter-type", help="Разделитель: COMMA | SEMICOLON."
@@ -92,7 +95,7 @@ def upload_contacts_json(
     counter_id: int = typer.Argument(..., help="ID счётчика."),
     data: str = typer.Option(..., "--data", help=DATA_HELP),
     merge_mode: MergeMode = typer.Option(
-        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE."
+        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE | UPDATE."
     ),
 ) -> None:
     """Загрузить клиентов из JSON (тело {"contacts": [...]})."""
@@ -119,7 +122,7 @@ def upload_orders(
         help="Соответствие столбцов атрибутам (см. openapi uploadOrders).",
     ),
     merge_mode: MergeMode = typer.Option(
-        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE."
+        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE | UPDATE."
     ),
     delimiter_type: Optional[Delimiter] = typer.Option(
         None, "--delimiter-type", help="Разделитель: COMMA | SEMICOLON."
@@ -147,7 +150,7 @@ def upload_orders_json(
     counter_id: int = typer.Argument(..., help="ID счётчика."),
     data: str = typer.Option(..., "--data", help=DATA_HELP),
     merge_mode: MergeMode = typer.Option(
-        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE."
+        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE | UPDATE."
     ),
 ) -> None:
     """Загрузить заказы из JSON (тело {"orders": [...]})."""
@@ -171,7 +174,7 @@ def upload_simple_orders(
         ..., "--file", help="Путь к CSV-файлу клиентов и заказов."
     ),
     merge_mode: MergeMode = typer.Option(
-        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE."
+        ..., "--merge-mode", help="Режим сохранения: APPEND | SAVE | UPDATE."
     ),
     delimiter_type: Optional[Delimiter] = typer.Option(
         None, "--delimiter-type", help="Разделитель: COMMA | SEMICOLON."
