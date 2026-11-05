@@ -14,7 +14,10 @@ from ..output import print_json
 
 app = typer.Typer(help="Лог-запросы (сырые данные, Logs API).", no_args_is_help=True)
 
-DATA_HELP = "JSON-тело запроса: строка, @файл или - (stdin); source/date1/date2/fields."
+DATA_HELP = (
+    "JSON-объект: строка, @файл или - (stdin); ключи date1/date2/fields/source"
+    " (+ attribution). Уходят в query-строку — тела у запроса нет."
+)
 
 
 def _api(ctx: typer.Context) -> Logs:
@@ -62,9 +65,14 @@ def create(
     data: str = typer.Option(..., "--data", help=DATA_HELP),
 ) -> None:
     """Создать лог-запрос (период ≤1 год; квота 10 ГБ/счётчик)."""
+    body = parse_data(data)
+    if not isinstance(body, dict):
+        raise typer.BadParameter(
+            "Ожидается JSON-объект с ключами date1/date2/fields/source/attribution"
+        )
     render(
         ctx,
-        _api(ctx).create(counter_id, parse_data(data), pretty=get_state(ctx).pretty),
+        _api(ctx).create(counter_id, body, pretty=get_state(ctx).pretty),
     )
 
 
