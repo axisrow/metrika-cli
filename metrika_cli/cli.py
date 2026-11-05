@@ -8,9 +8,9 @@ API Метрики «1 в 1»: одна группа команд = одна р�
 - stat → Reports API (/stat/v1); logs → Logs API;
 - data-import: conversions, calls, expenses, user_params, yclid.
 
-Каркасные группы без команд показывают справку (``no_args_is_help``); их
-команды приходят в фичевых PR (issues 2–19). Единый источник правды по
-эндпоинтам — registry/.
+Группа ``yclid`` пустая — API yclid_conversions удалён Яндексом
+(17.06.2020), она показывает вердикт-справку (``no_args_is_help``).
+Единый источник правды по эндпоинтам — registry/.
 
 Запуск: ``metrika ...`` (консольный скрипт) или ``python -m metrika_cli ...``.
 """
@@ -48,8 +48,9 @@ from .commands import yclid as yclid_cli
 app = typer.Typer(
     name="metrika",
     help=(
-        "CLI для API Яндекс Метрики: stat (отчёты), counters/logs и каркасы "
-        f"остальных групп. {len(registry.ENDPOINTS)} эндпоинтов."
+        "CLI для API Яндекс Метрики: management (counters, goals, filters, "
+        "grants…), stat (отчёты), logs, data import (conversions, calls, "
+        f"expenses, user_params). Эндпоинтов: {len(registry.ENDPOINTS)}."
     ),
     no_args_is_help=True,
     add_completion=True,

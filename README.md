@@ -2,7 +2,7 @@
 
 CLI для API Яндекс Метрики. Структура зеркалит API 1:1: одна группа команд = одна ресурсная группа API.
 
-18 групп (69 эндпоинтов; для групп с пометкой «каркас» команды приходят в фичевых PR — issues 2–19 эпика):
+18 групп (81 эндпоинт): management (11 групп), stat (6 операций), logs (7 операций) и Data Import (4 группы).
 
 | Группа | API | Префикс | Операции |
 |---|---|---|---|
@@ -14,12 +14,12 @@ CLI для API Яндекс Метрики. Структура зеркалит 
 | `metrika delegates` | Management API | `/management/v1` | `list`, `create`, `delete` |
 | `metrika accounts` | Management API | `/management/v1` | `list`, `update`, `delete` |
 | `metrika segments` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
-| `metrika labels` | Management API | `/management/v1` | каркас: метки и привязка к счётчикам |
-| `metrika annotations` | Management API | `/management/v1` | каркас: графические аннотации счётчика |
+| `metrika labels` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete`, `link`, `unlink` |
+| `metrika annotations` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
 | `metrika access_filters` | Management API | `/management/v1` | `list`, `get`, `create`, `edit`, `delete` |
 | `metrika stat` | Reports API | `/stat/v1` | `table`, `bytime`, `comparison`, `drilldown`, `comparison-drilldown`, `pivot` |
 | `metrika logs` | Logs API | `/management/v1/counter/{id}/logrequest…` | `evaluate`, `list`, `create`, `info`, `cancel`, `clean`, `download-part` |
-| `metrika conversions` | Data Import | `/management/v1` | каркас: офлайн-конверсии (upload + uploadings) |
+| `metrika conversions` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading` |
 | `metrika calls` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading` |
 | `metrika expenses` | Data Import | `/management/v1` | `upload`, `delete`, `delete-single`, `uploadings`, `uploading` |
 | `metrika user_params` | Data Import | `/management/v1` | `upload`, `uploadings`, `uploading`, `confirm` |
@@ -102,8 +102,16 @@ ruff check .
 
 ## Roadmap
 
-- Management: цели, фильтры, операции, grants, delegates, accounts;
-- Management (следующий слой): segments, labels, chart annotations, access filters, chats, clients, cloud exports;
-- Data Import: офлайн-конверсии, звонки, расходы, user params (upload на management-хосте);
-- `stat evaluate`, каталог метрик/группировок;
-- `metrika auth login` (OAuth device-flow).
+Реализовано:
+
+- Management API: `counters`, `goals`, `filters`, `operations`, `grants`, `delegates`, `accounts`, `segments`, `labels`, `annotations`, `access_filters`;
+- Reports API (`stat`): `table`, `bytime`, `comparison`, `comparison-drilldown`, `drilldown`, `pivot` — 6 операций; `stat evaluate` и каталог метрик/группировок как эндпоинты не существуют (вердикт в [docs/api-notes.md](docs/api-notes.md));
+- Logs API (`logs`): `evaluate`, `list`, `create`, `info`, `cancel`, `clean`, `download-part` — 7 операций;
+- Data Import: `conversions`, `calls`, `expenses`, `user_params`; `yclid` — API удалён Яндексом (17.06.2020), YCLID-конверсии идут через `metrika conversions` (`client_id_type=YCLID`), группа показывает вердикт-справку.
+
+Отложено владельцем:
+
+- `metrika auth login` (OAuth device-flow) — issue #12;
+- живая проверка обработки `Retry-After` — до появления тестового токена (ретрай в `client.py` покрыт юнит-тестами).
+
+Не заведены (есть в API, вне эпика): chats, clients, cloud exports, Measurement Protocol.
