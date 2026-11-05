@@ -37,6 +37,7 @@ GROUP_ANNOTATIONS = "annotations"
 GROUP_ACCESS_FILTERS = "access_filters"
 GROUP_CLIENTS = "clients"
 GROUP_MEASUREMENT = "measurement"
+GROUP_EXPORT = "export"
 GROUP_YCLID = "yclid"
 
 #: Имя переменной, в которой каждый файл-эндпоинт объявляет свой ``Endpoint``.
@@ -89,6 +90,8 @@ GROUPS: Tuple[str, ...] = (
     GROUP_CALLS,
     GROUP_EXPENSES,
     GROUP_USER_PARAMS,
+    # Экспорт в Yandex Cloud (/export/v1), в конце.
+    GROUP_EXPORT,
     GROUP_YCLID,
 )
 
