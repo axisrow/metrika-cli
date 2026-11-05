@@ -1,8 +1,10 @@
 """Ресурс «Отчёты» (Reports API, /stat/v1) — 6 эндпоинтов.
 
 Общие параметры: ids, metrics (≤20), dimensions (≤10), date1/date2,
-filters, sort, limit (≤100000, default 100), offset (с 1), preset, lang.
-Формат ответа: JSON или CSV (расширение .csv в пути).
+filters, sort, limit (≤100000, default 100), offset (с 1), preset, lang;
+параметры семплирования/окружения: accuracy, proposed_accuracy, timezone
+(±hh:mm), include_undefined, direct_client_logins (проверено по openapi
+stat 2026-11-05). Формат ответа: JSON или CSV (расширение .csv в пути).
 """
 
 from __future__ import annotations
@@ -31,6 +33,11 @@ class Stat(Resource):
         offset: Optional[int] = None,
         preset: Optional[str] = None,
         lang: Optional[str] = None,
+        accuracy: Optional[str] = None,
+        proposed_accuracy: Optional[bool] = None,
+        timezone: Optional[str] = None,
+        include_undefined: Optional[bool] = None,
+        direct_client_logins: Optional[str] = None,
         csv: bool = False,
         pretty: bool = False,
     ) -> Any:
@@ -58,6 +65,16 @@ class Stat(Resource):
         offset: Optional[int] = None,
         preset: Optional[str] = None,
         lang: Optional[str] = None,
+        accuracy: Optional[str] = None,
+        proposed_accuracy: Optional[bool] = None,
+        timezone: Optional[str] = None,
+        include_undefined: Optional[bool] = None,
+        direct_client_logins: Optional[str] = None,
+        top_keys: Optional[str] = None,
+        row_ids: Optional[str] = None,
+        include_annotations: Optional[bool] = None,
+        annotation_groups: Optional[str] = None,
+        keys_sort: Optional[str] = None,
         csv: bool = False,
         pretty: bool = False,
     ) -> Any:
@@ -87,6 +104,11 @@ class Stat(Resource):
         offset: Optional[int] = None,
         preset: Optional[str] = None,
         lang: Optional[str] = None,
+        accuracy: Optional[str] = None,
+        proposed_accuracy: Optional[bool] = None,
+        timezone: Optional[str] = None,
+        include_undefined: Optional[bool] = None,
+        direct_client_logins: Optional[str] = None,
         csv: bool = False,
         pretty: bool = False,
     ) -> Any:
@@ -114,6 +136,12 @@ class Stat(Resource):
         offset: Optional[int] = None,
         preset: Optional[str] = None,
         lang: Optional[str] = None,
+        accuracy: Optional[str] = None,
+        proposed_accuracy: Optional[bool] = None,
+        timezone: Optional[str] = None,
+        include_undefined: Optional[bool] = None,
+        direct_client_logins: Optional[str] = None,
+        only_expandable_undefined: Optional[bool] = None,
         csv: bool = False,
         pretty: bool = False,
     ) -> Any:
@@ -144,6 +172,12 @@ class Stat(Resource):
         offset: Optional[int] = None,
         preset: Optional[str] = None,
         lang: Optional[str] = None,
+        accuracy: Optional[str] = None,
+        proposed_accuracy: Optional[bool] = None,
+        timezone: Optional[str] = None,
+        include_undefined: Optional[bool] = None,
+        direct_client_logins: Optional[str] = None,
+        only_expandable_undefined: Optional[bool] = None,
         csv: bool = False,
         pretty: bool = False,
     ) -> Any:
@@ -171,6 +205,13 @@ class Stat(Resource):
         offset: Optional[int] = None,
         preset: Optional[str] = None,
         lang: Optional[str] = None,
+        accuracy: Optional[str] = None,
+        proposed_accuracy: Optional[bool] = None,
+        timezone: Optional[str] = None,
+        include_undefined: Optional[bool] = None,
+        direct_client_logins: Optional[str] = None,
+        pivot_limit: Optional[int] = None,
+        pivot_offset: Optional[int] = None,
         csv: bool = False,
         pretty: bool = False,
     ) -> Any:

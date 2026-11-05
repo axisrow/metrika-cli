@@ -45,6 +45,37 @@ LANG = Annotated[
 ]
 CSV = Annotated[bool, typer.Option("--csv", help="Ответ CSV вместо JSON.")]
 
+# Семплирование и окружение (общие для всех 6 операций, openapi stat).
+ACCURACY = Annotated[
+    Optional[str],
+    typer.Option("--accuracy", help="Размер выборки (семплирование)."),
+]
+PROPOSED_ACCURACY = Annotated[
+    Optional[bool],
+    typer.Option(
+        "--proposed-accuracy",
+        help="Разрешить API поднять accuracy до рекомендованного.",
+    ),
+]
+TIMEZONE = Annotated[
+    Optional[str],
+    typer.Option("--timezone", help="Часовой пояс выборки в формате ±hh:mm."),
+]
+INCLUDE_UNDEFINED = Annotated[
+    Optional[bool],
+    typer.Option(
+        "--include-undefined",
+        help="Включить строки с неопределённым значением первой группировки.",
+    ),
+]
+DIRECT_CLIENT_LOGINS = Annotated[
+    Optional[str],
+    typer.Option(
+        "--direct-client-logins",
+        help="Логины клиентов Директа через запятую (отчёт Директ-расходы).",
+    ),
+]
+
 
 def _api(ctx: typer.Context) -> Stat:
     return Stat(get_state(ctx).client())
@@ -72,6 +103,11 @@ def table(
     offset: OFFSET = None,
     preset: PRESET = None,
     lang: LANG = None,
+    accuracy: ACCURACY = None,
+    proposed_accuracy: PROPOSED_ACCURACY = None,
+    timezone: TIMEZONE = None,
+    include_undefined: INCLUDE_UNDEFINED = None,
+    direct_client_logins: DIRECT_CLIENT_LOGINS = None,
     csv: CSV = False,
 ) -> None:
     """Сводная таблица: метрики × группировки."""
@@ -89,6 +125,11 @@ def table(
             offset=offset,
             preset=preset,
             lang=lang,
+            accuracy=accuracy,
+            proposed_accuracy=proposed_accuracy,
+            timezone=timezone,
+            include_undefined=include_undefined,
+            direct_client_logins=direct_client_logins,
             csv=csv,
         ),
         csv,
@@ -113,6 +154,43 @@ def bytime(
     offset: OFFSET = None,
     preset: PRESET = None,
     lang: LANG = None,
+    accuracy: ACCURACY = None,
+    proposed_accuracy: PROPOSED_ACCURACY = None,
+    timezone: TIMEZONE = None,
+    include_undefined: INCLUDE_UNDEFINED = None,
+    direct_client_logins: DIRECT_CLIENT_LOGINS = None,
+    top_keys: Annotated[
+        Optional[str],
+        typer.Option(
+            "--top-keys",
+            help="Число строк, если не задан --row-ids (макс. 30, default 7).",
+        ),
+    ] = None,
+    row_ids: Annotated[
+        Optional[str],
+        typer.Option(
+            "--row-ids",
+            help="Выбор строк для графиков (перечисление списков ключей, формат API).",
+        ),
+    ] = None,
+    include_annotations: Annotated[
+        Optional[bool],
+        typer.Option("--include-annotations", help="Включить примечания в ответ."),
+    ] = None,
+    annotation_groups: Annotated[
+        Optional[str],
+        typer.Option(
+            "--annotation-groups",
+            help="Группы примечаний через запятую (при --include-annotations).",
+        ),
+    ] = None,
+    keys_sort: Annotated[
+        Optional[str],
+        typer.Option(
+            "--keys-sort",
+            help="Сортировка по группировкам/метрикам через запятую («-» — по убыванию).",
+        ),
+    ] = None,
     csv: CSV = False,
 ) -> None:
     """Динамика метрик по времени."""
@@ -131,6 +209,16 @@ def bytime(
             offset=offset,
             preset=preset,
             lang=lang,
+            accuracy=accuracy,
+            proposed_accuracy=proposed_accuracy,
+            timezone=timezone,
+            include_undefined=include_undefined,
+            direct_client_logins=direct_client_logins,
+            top_keys=top_keys,
+            row_ids=row_ids,
+            include_annotations=include_annotations,
+            annotation_groups=annotation_groups,
+            keys_sort=keys_sort,
             csv=csv,
         ),
         csv,
@@ -155,6 +243,11 @@ def comparison(
     offset: OFFSET = None,
     preset: PRESET = None,
     lang: LANG = None,
+    accuracy: ACCURACY = None,
+    proposed_accuracy: PROPOSED_ACCURACY = None,
+    timezone: TIMEZONE = None,
+    include_undefined: INCLUDE_UNDEFINED = None,
+    direct_client_logins: DIRECT_CLIENT_LOGINS = None,
     csv: CSV = False,
 ) -> None:
     """Сравнение периодов (date*_a vs date*_b) или сегментов (filters_a vs filters_b)."""
@@ -175,6 +268,11 @@ def comparison(
             offset=offset,
             preset=preset,
             lang=lang,
+            accuracy=accuracy,
+            proposed_accuracy=proposed_accuracy,
+            timezone=timezone,
+            include_undefined=include_undefined,
+            direct_client_logins=direct_client_logins,
             csv=csv,
         ),
         csv,
@@ -201,6 +299,18 @@ def drilldown(
     offset: OFFSET = None,
     preset: PRESET = None,
     lang: LANG = None,
+    accuracy: ACCURACY = None,
+    proposed_accuracy: PROPOSED_ACCURACY = None,
+    timezone: TIMEZONE = None,
+    include_undefined: INCLUDE_UNDEFINED = None,
+    direct_client_logins: DIRECT_CLIENT_LOGINS = None,
+    only_expandable_undefined: Annotated[
+        Optional[bool],
+        typer.Option(
+            "--only-expandable-undefined",
+            help="Строки «не определено» только для разворачиваемых группировок.",
+        ),
+    ] = None,
     csv: CSV = False,
 ) -> None:
     """Иерархический отчёт (drill down; фильтровать по ID, не по именам)."""
@@ -219,6 +329,12 @@ def drilldown(
             offset=offset,
             preset=preset,
             lang=lang,
+            accuracy=accuracy,
+            proposed_accuracy=proposed_accuracy,
+            timezone=timezone,
+            include_undefined=include_undefined,
+            direct_client_logins=direct_client_logins,
+            only_expandable_undefined=only_expandable_undefined,
             csv=csv,
         ),
         csv,
@@ -246,6 +362,18 @@ def comparison_drilldown(
     offset: OFFSET = None,
     preset: PRESET = None,
     lang: LANG = None,
+    accuracy: ACCURACY = None,
+    proposed_accuracy: PROPOSED_ACCURACY = None,
+    timezone: TIMEZONE = None,
+    include_undefined: INCLUDE_UNDEFINED = None,
+    direct_client_logins: DIRECT_CLIENT_LOGINS = None,
+    only_expandable_undefined: Annotated[
+        Optional[bool],
+        typer.Option(
+            "--only-expandable-undefined",
+            help="Строки «не определено» только для разворачиваемых группировок.",
+        ),
+    ] = None,
     csv: CSV = False,
 ) -> None:
     """Сравнение периодов/сегментов по дереву группировок (drill down)."""
@@ -267,6 +395,12 @@ def comparison_drilldown(
             offset=offset,
             preset=preset,
             lang=lang,
+            accuracy=accuracy,
+            proposed_accuracy=proposed_accuracy,
+            timezone=timezone,
+            include_undefined=include_undefined,
+            direct_client_logins=direct_client_logins,
+            only_expandable_undefined=only_expandable_undefined,
             csv=csv,
         ),
         csv,
@@ -291,6 +425,17 @@ def pivot(
     offset: OFFSET = None,
     preset: PRESET = None,
     lang: LANG = None,
+    accuracy: ACCURACY = None,
+    proposed_accuracy: PROPOSED_ACCURACY = None,
+    timezone: TIMEZONE = None,
+    include_undefined: INCLUDE_UNDEFINED = None,
+    direct_client_logins: DIRECT_CLIENT_LOGINS = None,
+    pivot_limit: Annotated[
+        Optional[int], typer.Option("--pivot-limit", help="Лимит строк разворота.")
+    ] = None,
+    pivot_offset: Annotated[
+        Optional[int], typer.Option("--pivot-offset", help="Смещение строк разворота.")
+    ] = None,
     csv: CSV = False,
 ) -> None:
     """Сводная таблица (pivot)."""
@@ -309,6 +454,13 @@ def pivot(
             offset=offset,
             preset=preset,
             lang=lang,
+            accuracy=accuracy,
+            proposed_accuracy=proposed_accuracy,
+            timezone=timezone,
+            include_undefined=include_undefined,
+            direct_client_logins=direct_client_logins,
+            pivot_limit=pivot_limit,
+            pivot_offset=pivot_offset,
             csv=csv,
         ),
         csv,
