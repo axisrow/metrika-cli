@@ -47,6 +47,17 @@ class Delimiter(str, Enum):
     SEMICOLON = "SEMICOLON"
 
 
+class EntityType(str, Enum):
+    """Принадлежность атрибутов (openapi schema/getAttributes.md):
+    CONTACT — контакты; COMPANY — компании; ORDER — заказы;
+    SIMPLE_ORDER — простые заказы."""
+
+    CONTACT = "CONTACT"
+    COMPANY = "COMPANY"
+    ORDER = "ORDER"
+    SIMPLE_ORDER = "SIMPLE_ORDER"
+
+
 def _wrap(key: str, data) -> dict:
     """Список строк обернуть в документированное тело {key: [...]}, объект
     передать как есть (полный {"key": [...]} или {"key": [...], ...})."""
@@ -222,5 +233,117 @@ def last_uploadings(
             limit=limit,
             source=source,
             pretty=get_state(ctx).pretty,
+        ),
+    )
+
+
+@app.command("attributes")
+@handle_errors
+def attributes(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+    entity_type: EntityType = typer.Option(
+        ...,
+        "--entity-type",
+        help="Принадлежность: CONTACT | COMPANY | ORDER | SIMPLE_ORDER (обязательный).",
+    ),
+) -> None:
+    """Все атрибуты сущности."""
+    render(
+        ctx,
+        _api(ctx).attributes(
+            counter_id, entity_type.value, pretty=get_state(ctx).pretty
+        ),
+    )
+
+
+@app.command("create-attributes")
+@handle_errors
+def create_attributes(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+    entity_type: EntityType = typer.Option(
+        ...,
+        "--entity-type",
+        help="Принадлежность: CONTACT | COMPANY | ORDER | SIMPLE_ORDER (обязательный).",
+    ),
+    data: str = typer.Option(..., "--data", help=DATA_HELP),
+) -> None:
+    """Создать атрибуты (тело {"attributes": [...]})."""
+    render(
+        ctx,
+        _api(ctx).create_attributes(
+            counter_id,
+            _wrap("attributes", parse_data(data)),
+            entity_type=entity_type.value,
+            pretty=get_state(ctx).pretty,
+        ),
+    )
+
+
+@app.command("order-statuses")
+@handle_errors
+def order_statuses(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+) -> None:
+    """Сопоставленные статусы заказов."""
+    render(ctx, _api(ctx).order_statuses(counter_id, pretty=get_state(ctx).pretty))
+
+
+@app.command("map-order-statuses")
+@handle_errors
+def map_order_statuses(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+    data: str = typer.Option(..., "--data", help=DATA_HELP),
+) -> None:
+    """Сопоставить статусы заказов (тело {"order_statuses": [...]})."""
+    render(
+        ctx,
+        _api(ctx).map_order_statuses(
+            counter_id,
+            _wrap("order_statuses", parse_data(data)),
+            pretty=get_state(ctx).pretty,
+        ),
+    )
+
+
+@app.command("predefined-types")
+@handle_errors
+def predefined_types(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+) -> None:
+    """Типы пользовательских атрибутов."""
+    render(ctx, _api(ctx).predefined_types(counter_id, pretty=get_state(ctx).pretty))
+
+
+@app.command("types")
+@handle_errors
+def types(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+) -> None:
+    """Типы системных атрибутов."""
+    render(ctx, _api(ctx).types(counter_id, pretty=get_state(ctx).pretty))
+
+
+@app.command("create-products")
+@handle_errors
+def create_products(
+    ctx: typer.Context,
+    counter_id: int = typer.Argument(..., help="ID счётчика."),
+    data: str = typer.Option(
+        ...,
+        "--data",
+        help='JSON-тело: {"attributes": [...], "items": [...]} (строка, @файл, -).',
+    ),
+) -> None:
+    """Создать список товаров."""
+    render(
+        ctx,
+        _api(ctx).create_products(
+            counter_id, parse_data(data), pretty=get_state(ctx).pretty
         ),
     )
