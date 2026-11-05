@@ -45,3 +45,11 @@ class Goals(Resource):
 
     def delete(self, counter_id: int, goal_id: int, *, pretty: bool = False) -> Any:
         return self._call("delete", counterId=counter_id, goalId=goal_id, pretty=pretty)
+
+    # -- справочники (без counterId) ------------------------------------------
+
+    def messengers(self, *, pretty: bool = False) -> Any:
+        return self._call("messengers", pretty=pretty)
+
+    def social_networks(self, *, pretty: bool = False) -> Any:
+        return self._call("social_networks", pretty=pretty)
